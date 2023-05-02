@@ -13,8 +13,14 @@ function UserInfoBox() {
         </div>
       </div>
       <div className="follow-group flex gap-8 items-center">
-        <p>5 Followers</p>
-        <p>23 Following</p>
+        <p>
+          <span className="font-medium">5</span>{" "}
+          <span className="text-secTextColor text-sm">Followers</span>
+        </p>
+        <p>
+          <span className="font-medium">23</span>{" "}
+          <span className="text-secTextColor text-sm">Following</span>
+        </p>
       </div>
     </div>
   );

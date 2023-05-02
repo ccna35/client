@@ -3,6 +3,7 @@ import Navbar from "../components/GlobalComponents/Navbar/Navbar";
 import UserBox from "../components/LeftSide/UserInfoBox";
 import PeopleToFollow from "../components/LeftSide/PeopleToFollow";
 import { io } from "socket.io-client";
+import Footer from "../components/GlobalComponents/Footer";
 
 // const socket = io("http://localhost:3000/");
 
@@ -21,6 +22,7 @@ const Root = () => {
         </div>
         <Outlet />
       </div>
+      <Footer />
     </div>
   );
 };

@@ -4,44 +4,21 @@ import { HiHome } from "react-icons/hi";
 import { FaBell, FaFacebookMessenger, FaUserAlt } from "react-icons/fa";
 import { BsFillGearFill } from "react-icons/bs";
 import { FiLogOut } from "react-icons/fi";
-import { initializeApp } from "firebase/app";
-import {
-  createUserWithEmailAndPassword,
-  getAuth,
-  signOut,
-} from "firebase/auth";
-import { doc, getFirestore, setDoc } from "firebase/firestore/lite";
-import { useState } from "react";
+import { signOut } from "firebase/auth";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyCftaxupb8F0cgeA8cG-LebDbB3copWCHA",
-  authDomain: "social-media-d89dd.firebaseapp.com",
-  projectId: "social-media-d89dd",
-  storageBucket: "social-media-d89dd.appspot.com",
-  messagingSenderId: "909295195071",
-  appId: "1:909295195071:web:557f78e0c7196d9085870a",
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-
-// Initialize Firebase Authentication and get a reference to the service
-const auth = getAuth(app);
+import { auth } from "../../../firebase/config";
 
 const Navbar = () => {
   const navigate = useNavigate();
 
-  const handleSignOut = () => {
-    signOut(auth)
-      .then(() => {
-        // Sign-out successful.
-        console.log("Sign-out successful.");
-        navigate("/login");
-      })
-      .catch((error) => {
-        // An error happened.
-        console.log(error);
-      });
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+      navigate("/login");
+      console.log("Sign-out successful.");
+    } catch (error) {
+      console.log(error);
+    }
   };
   return (
     <nav className="py-4 px-4 md:px-0 bg-white border-b border-borderColor mb-12">
@@ -79,12 +56,14 @@ const Navbar = () => {
           <FaFacebookMessenger />
           <p className="hidden lg:block">Messages</p>
         </NavLink>
-        <div className="py-2 px-4 bg-secondBgColor rounded-lg flex items-center gap-2 hover:bg-gray-300 transition-colors duration-300 cursor-pointer">
+        <button
+          className="py-2 px-4 bg-secondBgColor rounded-lg flex items-center gap-2 hover:bg-gray-300 transition-colors duration-300 cursor-pointer"
+          type="button"
+          onClick={handleSignOut}
+        >
           <FiLogOut />
-          <p className="hidden lg:block" onClick={handleSignOut}>
-            Log out
-          </p>
-        </div>
+          <p className="hidden lg:block">Log out</p>
+        </button>
       </div>
     </nav>
   );

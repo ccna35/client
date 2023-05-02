@@ -1,22 +1,7 @@
-import { initializeApp } from "firebase/app";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyCftaxupb8F0cgeA8cG-LebDbB3copWCHA",
-  authDomain: "social-media-d89dd.firebaseapp.com",
-  projectId: "social-media-d89dd",
-  storageBucket: "social-media-d89dd.appspot.com",
-  messagingSenderId: "909295195071",
-  appId: "1:909295195071:web:557f78e0c7196d9085870a",
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-
-// Initialize Firebase Authentication and get a reference to the service
-const auth = getAuth(app);
+import { auth } from "../../firebase/config";
 
 const LoginForm = ({ setCurrentForm }) => {
   const [email, setEmail] = useState("");

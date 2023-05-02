@@ -1,26 +1,8 @@
-import { initializeApp } from "firebase/app";
-import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
-import { doc, getFirestore, setDoc } from "firebase/firestore/lite";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore/lite";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyCftaxupb8F0cgeA8cG-LebDbB3copWCHA",
-  authDomain: "social-media-d89dd.firebaseapp.com",
-  projectId: "social-media-d89dd",
-  storageBucket: "social-media-d89dd.appspot.com",
-  messagingSenderId: "909295195071",
-  appId: "1:909295195071:web:557f78e0c7196d9085870a",
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-
-// Initialize Cloud Firestore and get a reference to the service
-const db = getFirestore(app);
-
-// Initialize Firebase Authentication and get a reference to the service
-const auth = getAuth(app);
+import { auth, db } from "../../firebase/config";
 
 const SignupForm = ({ setCurrentForm }) => {
   const [firstName, setFirstName] = useState("");
@@ -46,6 +28,7 @@ const SignupForm = ({ setCurrentForm }) => {
           username,
           email,
           createdAt: user.metadata.creationTime,
+          profilePhoto: null,
         });
         console.log(user);
         navigate("/");
@@ -119,6 +102,7 @@ const SignupForm = ({ setCurrentForm }) => {
           placeholder="Confirm password"
           className="p-2 text-sm rounded outline-none shadow-sm border border-borderColor"
           required
+          onChange={(e) => setConfirmPassword(e.target.value)}
         />
         <input
           type="submit"

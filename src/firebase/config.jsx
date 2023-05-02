@@ -1,24 +1,20 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, getDocs } from "firebase/firestore/lite";
+import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCftaxupb8F0cgeA8cG-LebDbB3copWCHA",
-  authDomain: "social-media-d89dd.firebaseapp.com",
-  projectId: "social-media-d89dd",
-  storageBucket: "social-media-d89dd.appspot.com",
-  messagingSenderId: "909295195071",
-  appId: "1:909295195071:web:557f78e0c7196d9085870a",
+  apiKey: "AIzaSyDeaNGdGTGUICVmVIi1EQeP3Hwu3P9-fng",
+  authDomain: "socail-media-v2.firebaseapp.com",
+  projectId: "socail-media-v2",
+  storageBucket: "socail-media-v2.appspot.com",
+  messagingSenderId: "619027647298",
+  appId: "1:619027647298:web:919b830b3630e8fbdf56db",
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
+export const app = initializeApp(firebaseConfig);
+
+// Initialize Firebase Authentication and get a reference to the service
+export const auth = getAuth(app);
 
 export const db = getFirestore(app);
-
-// Get a list of cities from your database
-export async function getPosts(db) {
-  const postsCol = collection(db, "posts");
-  const postSnapshot = await getDocs(postsCol);
-  const postList = postSnapshot.docs.map((doc) => doc.data());
-  return postList;
-}

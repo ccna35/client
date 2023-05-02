@@ -1,55 +1,77 @@
 import { useNavigate } from "react-router-dom";
 import NewPost from "../components/HomePage Components/NewPost";
 import Post from "../components/HomePage Components/Post";
-import useFetchPosts from "../custom hooks/useFetchPosts";
-import { db, getPosts } from "../firebase/config";
-import { initializeApp } from "firebase/app";
+import Spinner from "../components/GlobalComponents/Spinner";
+import { auth, db } from "../firebase/config";
+import { onAuthStateChanged } from "firebase/auth";
+import { useEffect, useState } from "react";
 import {
-  createUserWithEmailAndPassword,
-  getAuth,
-  onAuthStateChanged,
-} from "firebase/auth";
-import { useState } from "react";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyCftaxupb8F0cgeA8cG-LebDbB3copWCHA",
-  authDomain: "social-media-d89dd.firebaseapp.com",
-  projectId: "social-media-d89dd",
-  storageBucket: "social-media-d89dd.appspot.com",
-  messagingSenderId: "909295195071",
-  appId: "1:909295195071:web:557f78e0c7196d9085870a",
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-
-// Initialize Firebase Authentication and get a reference to the service
-const auth = getAuth(app);
+  onSnapshot,
+  collection,
+  where,
+  query,
+  orderBy,
+  limit,
+} from "firebase/firestore";
+import { motion } from "framer-motion";
 
 const HomePage = () => {
+  console.log("HomePage Rendered");
+
   const navigate = useNavigate();
 
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      // User is signed in, see docs for a list of available properties
-      // https://firebase.google.com/docs/reference/js/firebase.User
-      const uid = user;
-      console.log(uid);
-      // const posts = useFetchPosts();
-      // ...
-    } else {
-      // User is signed out
-      // ...
-      navigate("/login");
-    }
-  });
+  const [userId, setUserId] = useState(null);
+
+  const [posts, setPosts] = useState([]);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const uid = user.uid;
+        setUserId(uid);
+      } else {
+        // User is signed out
+        // ...
+        navigate("/login");
+      }
+    });
+
+    return unsubscribe();
+  }, []);
+
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const q = query(collection(db, "posts"), where("user", "==", userId));
+    onSnapshot(q, (querySnapshot) => {
+      const cities = [];
+      querySnapshot.forEach((doc) => {
+        cities.push({ id: doc.id, ...doc.data() });
+      });
+      setPosts([...cities]);
+    });
+
+    setIsLoading(false);
+  }, [userId]);
 
   return (
     <div className="lg:col-start-3 lg:col-span-4 flex flex-col gap-8">
-      <NewPost />
-      <Post />
-      <Post />
-      <Post />
+      <NewPost userId={userId} />
+      <motion.div layout className="flex flex-col gap-8">
+        {isLoading ? (
+          <Spinner />
+        ) : posts.length === 0 ? (
+          <div className="grid place-items-center p-4 border rounded-lg bg-white">
+            You have no posts to show :(
+          </div>
+        ) : (
+          posts.map((post) => {
+            return (
+              <Post key={post?.id} post={post} setIsLoading={setIsLoading} />
+            );
+          })
+        )}
+      </motion.div>
     </div>
   );
 };
