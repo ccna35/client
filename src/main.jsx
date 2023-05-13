@@ -10,6 +10,9 @@ import ProfilePage from "./pages/ProfilePage.jsx";
 import SettingsPage from "./pages/SettingsPage.jsx";
 import Root from "./routes/root.jsx";
 import MessagesPage from "./pages/MessagesPage.jsx";
+import { create } from "zustand";
+import { Provider } from "react-redux";
+import { store } from "./app/store.jsx";
 
 const router = createBrowserRouter([
   {
@@ -22,7 +25,7 @@ const router = createBrowserRouter([
         element: <HomePage />,
       },
       {
-        path: "/profile",
+        path: "/user/:id",
         element: <ProfilePage />,
       },
       {
@@ -44,6 +47,8 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     {/* <App /> */}
-    <RouterProvider router={router} />
+    <Provider store={store}>
+      <RouterProvider router={router} />
+    </Provider>
   </React.StrictMode>
 );

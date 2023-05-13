@@ -17,7 +17,7 @@ const Comment = ({ comment }) => {
   return (
     <div className="comment-example grid items-center grid-cols-[1fr,2fr,5fr]">
       <div className="user-img w-10 h-10 rounded-full overflow-hidden">
-        <img src={comment.profilePhoto || "./profile/userPhoto.png"} alt="" />
+        <img src={comment.profilePhoto || "../profile/userPhoto.png"} alt="" />
       </div>
       <h3 className="text-textColor font-medium text-sm">
         {userDetails.firstName + " " + userDetails.lastName}

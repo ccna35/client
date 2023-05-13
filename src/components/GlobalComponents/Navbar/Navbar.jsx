@@ -4,12 +4,33 @@ import { HiHome } from "react-icons/hi";
 import { FaBell, FaFacebookMessenger, FaUserAlt } from "react-icons/fa";
 import { BsFillGearFill } from "react-icons/bs";
 import { FiLogOut } from "react-icons/fi";
-import { signOut } from "firebase/auth";
+import { onAuthStateChanged, signOut } from "firebase/auth";
 
 import { auth } from "../../../firebase/config";
+import { useDispatch, useSelector } from "react-redux";
+import { getUserId, updateUserStatus } from "../../../features/user/userSlice";
+import { useEffect, useState } from "react";
 
 const Navbar = () => {
   const navigate = useNavigate();
+
+  const [userId, setUserId] = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // getting login-in user id...
+        const uid = user.uid;
+        setUserId(uid);
+      } else {
+        // User is signed out
+        // ...
+        navigate("/login");
+      }
+    });
+
+    return unsubscribe();
+  }, []);
 
   const handleSignOut = async () => {
     try {
@@ -20,6 +41,7 @@ const Navbar = () => {
       console.log(error);
     }
   };
+
   return (
     <nav className="py-4 px-4 md:px-0 bg-white border-b border-borderColor mb-12">
       <div className="container mx-auto flex justify-between">
@@ -32,7 +54,7 @@ const Navbar = () => {
         </NavLink>
         <SearchInput />
         <NavLink
-          to="/profile"
+          to={"user/" + userId}
           className="py-2 px-4 bg-secondBgColor rounded-lg flex items-center gap-2 hover:bg-gray-300 transition-colors duration-300"
         >
           <FaUserAlt />

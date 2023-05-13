@@ -1,10 +1,16 @@
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore/lite";
+// import { doc, setDoc } from "firebase/firestore/lite";
+import { doc, setDoc } from "firebase/firestore";
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth, db } from "../../firebase/config";
+import { useDispatch } from "react-redux";
+import { getUserId, updateUserStatus } from "../../features/user/userSlice";
 
 const SignupForm = ({ setCurrentForm }) => {
+  const dispatch = useDispatch();
+
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [username, setUsername] = useState("");
@@ -29,8 +35,13 @@ const SignupForm = ({ setCurrentForm }) => {
           email,
           createdAt: user.metadata.creationTime,
           profilePhoto: null,
+          coverPhoto: null,
+          following: [],
+          followers: [],
         });
         console.log(user);
+        dispatch(updateUserStatus(true));
+        dispatch(getUserId(user.uid));
         navigate("/");
         // ...
       })
@@ -60,7 +71,7 @@ const SignupForm = ({ setCurrentForm }) => {
           type="text"
           name="firstName"
           placeholder="First name"
-          className="p-2 text-sm rounded outline-none shadow-sm border border-borderColor"
+          className="p-2 text-sm rounded outline-none shadow-sm border border-borderColor focus:border-accentColor transition-colors duration-300"
           required
           onChange={(e) => setFirstName(e.target.value)}
         />
@@ -68,7 +79,7 @@ const SignupForm = ({ setCurrentForm }) => {
           type="text"
           name="lastName"
           placeholder="Last name"
-          className="p-2 text-sm rounded outline-none shadow-sm border border-borderColor"
+          className="p-2 text-sm rounded outline-none shadow-sm border border-borderColor focus:border-accentColor transition-colors duration-300"
           required
           onChange={(e) => setLastName(e.target.value)}
         />
@@ -76,7 +87,7 @@ const SignupForm = ({ setCurrentForm }) => {
           type="text"
           name="username"
           placeholder="Username"
-          className="p-2 text-sm rounded outline-none shadow-sm border border-borderColor"
+          className="p-2 text-sm rounded outline-none shadow-sm border border-borderColor focus:border-accentColor transition-colors duration-300"
           required
           onChange={(e) => setUsername(e.target.value)}
         />
@@ -84,7 +95,7 @@ const SignupForm = ({ setCurrentForm }) => {
           type="email"
           name="email"
           placeholder="Enter your email..."
-          className="p-2 text-sm rounded outline-none shadow-sm border border-borderColor"
+          className="p-2 text-sm rounded outline-none shadow-sm border border-borderColor focus:border-accentColor transition-colors duration-300"
           required
           onChange={(e) => setEmail(e.target.value)}
         />
@@ -92,7 +103,7 @@ const SignupForm = ({ setCurrentForm }) => {
           type="password"
           name="password"
           placeholder="Enter your password..."
-          className="p-2 text-sm rounded outline-none shadow-sm border border-borderColor"
+          className="p-2 text-sm rounded outline-none shadow-sm border border-borderColor focus:border-accentColor transition-colors duration-300"
           required
           onChange={(e) => setPassword(e.target.value)}
         />
@@ -100,7 +111,7 @@ const SignupForm = ({ setCurrentForm }) => {
           type="password"
           name="confirmPassword"
           placeholder="Confirm password"
-          className="p-2 text-sm rounded outline-none shadow-sm border border-borderColor"
+          className="p-2 text-sm rounded outline-none shadow-sm border border-borderColor focus:border-accentColor transition-colors duration-300"
           required
           onChange={(e) => setConfirmPassword(e.target.value)}
         />

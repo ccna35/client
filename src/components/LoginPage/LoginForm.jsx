@@ -2,8 +2,12 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../../firebase/config";
+import { useDispatch } from "react-redux";
+import { getUserId, updateUserStatus } from "../../features/user/userSlice";
 
 const LoginForm = ({ setCurrentForm }) => {
+  const dispatch = useDispatch();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
@@ -17,6 +21,8 @@ const LoginForm = ({ setCurrentForm }) => {
         // Signed in
         const user = userCredential.user;
         setErrorMsg("");
+        dispatch(updateUserStatus(true));
+        dispatch(getUserId(user.uid));
         navigate("/");
         // ...
       })
@@ -47,7 +53,7 @@ const LoginForm = ({ setCurrentForm }) => {
           name="email"
           required
           placeholder="Enter your email..."
-          className="p-2 text-sm rounded outline-none shadow-sm border border-borderColor"
+          className="p-2 text-sm rounded outline-none shadow-sm border border-borderColor focus:border-accentColor transition-colors duration-300"
           onChange={(e) => setEmail(e.target.value)}
         />
         <input
@@ -55,7 +61,7 @@ const LoginForm = ({ setCurrentForm }) => {
           name="password"
           required
           placeholder="Enter your password..."
-          className="p-2 text-sm rounded outline-none shadow-sm border border-borderColor"
+          className="p-2 text-sm rounded outline-none shadow-sm border border-borderColor focus:border-accentColor transition-colors duration-300"
           onChange={(e) => setPassword(e.target.value)}
         />
         {errorMsg && (

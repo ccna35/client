@@ -13,7 +13,7 @@ import {
   orderBy,
   limit,
 } from "firebase/firestore";
-import { motion } from "framer-motion";
+import { useGetPostsQuery } from "../features/api/apiSlice";
 
 const HomePage = () => {
   console.log("HomePage Rendered");
@@ -22,12 +22,15 @@ const HomePage = () => {
 
   const [userId, setUserId] = useState(null);
 
-  const [posts, setPosts] = useState([]);
+  // const [posts, setPosts] = useState([]);
+  // const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
+        // getting login-in user id...
         const uid = user.uid;
+        console.log(uid);
         setUserId(uid);
       } else {
         // User is signed out
@@ -39,39 +42,35 @@ const HomePage = () => {
     return unsubscribe();
   }, []);
 
-  const [isLoading, setIsLoading] = useState(true);
+  console.log(userId);
 
-  useEffect(() => {
-    const q = query(collection(db, "posts"), where("user", "==", userId));
-    onSnapshot(q, (querySnapshot) => {
-      const cities = [];
-      querySnapshot.forEach((doc) => {
-        cities.push({ id: doc.id, ...doc.data() });
-      });
-      setPosts([...cities]);
-    });
+  const { data, isLoading, isSuccess, isError, error } =
+    useGetPostsQuery(userId);
 
-    setIsLoading(false);
-  }, [userId]);
+  if (isSuccess) {
+    console.log("data.length: ", data.length);
+    console.log("data: ", data);
+  }
+  if (isError) {
+    console.log(error);
+  }
 
   return (
     <div className="lg:col-start-3 lg:col-span-4 flex flex-col gap-8">
       <NewPost userId={userId} />
-      <motion.div layout className="flex flex-col gap-8">
+      <div className="flex flex-col gap-8">
         {isLoading ? (
           <Spinner />
-        ) : posts.length === 0 ? (
+        ) : data.length === 0 ? (
           <div className="grid place-items-center p-4 border rounded-lg bg-white">
             You have no posts to show :(
           </div>
         ) : (
-          posts.map((post) => {
-            return (
-              <Post key={post?.id} post={post} setIsLoading={setIsLoading} />
-            );
+          data.map((post) => {
+            return <Post key={post?.id} post={post} />;
           })
         )}
-      </motion.div>
+      </div>
     </div>
   );
 };

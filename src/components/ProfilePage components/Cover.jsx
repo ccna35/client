@@ -14,7 +14,7 @@ const Cover = () => {
   return (
     <div className="cover-pic rounded-lg overflow-hidden h-[138px] cursor-pointer">
       <img
-        src="./profile/daiga-ellaby-ClWvcrkBhMY-unsplash.jpg"
+        src="../profile/daiga-ellaby-ClWvcrkBhMY-unsplash.jpg"
         className="w-full h-full object-cover"
         onClick={openModal}
       />
@@ -23,7 +23,7 @@ const Cover = () => {
         setIsOpen={setIsOpen}
         closeModal={closeModal}
         openModal={openModal}
-        imgUrl="./profile/daiga-ellaby-ClWvcrkBhMY-unsplash.jpg"
+        imgUrl="../profile/daiga-ellaby-ClWvcrkBhMY-unsplash.jpg"
       />
     </div>
   );

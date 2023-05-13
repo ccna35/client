@@ -1,15 +1,17 @@
-function UserFollow() {
+function UserFollow({ user }) {
+  const userPhoto = user.profilePhoto || "../profile/userPhoto.png";
+
   return (
     <div className="rounded-lg bg-white flex items-center justify-between">
       <div className="flex gap-4 items-center">
         <div className="user-img w-12 h-12 rounded-full overflow-hidden">
-          <img src="./people/vicky-hladynets-C8Ta0gwPbQg-unsplash.jpg" alt="" />
+          <img src={userPhoto} />
         </div>
         <div className="user-info flex flex-col">
           <h3 className="text-textColor transition-colors duration-300 text-lg">
-            Pat Wills
+            {user.firstName + " " + user.lastName}
           </h3>
-          <p className="text-secTextColor text-sm">@patwills</p>
+          <p className="text-secTextColor text-sm">@{user.username}</p>
         </div>
       </div>
       <button
