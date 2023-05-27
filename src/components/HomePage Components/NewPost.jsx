@@ -1,7 +1,7 @@
 import { IoDocumentsSharp } from "react-icons/io5";
 import { db } from "../../firebase/config";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useAddPostMutation } from "../../features/api/apiSlice";
 import {
   getStorage,
@@ -12,12 +12,7 @@ import {
 } from "firebase/storage";
 
 const NewPost = ({ userId }) => {
-  console.log("NewPost rerendered");
   const [text, setText] = useState("");
-
-  const [addPost, { isLoading, isSuccess, isError, error }] =
-    useAddPostMutation();
-
   const [file, setFile] = useState(null);
   const [image, setImage] = useState(null);
 
@@ -27,8 +22,6 @@ const NewPost = ({ userId }) => {
     let file = e.target.files[0];
 
     setFile(e.target.files[0]);
-
-    console.log(file);
 
     // Create the file metadata
     const metadata = {
@@ -46,7 +39,6 @@ const NewPost = ({ userId }) => {
         // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
         const progress =
           (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        console.log("Upload is " + progress + "% done");
         switch (snapshot.state) {
           case "paused":
             console.log("Upload is paused");
@@ -77,22 +69,40 @@ const NewPost = ({ userId }) => {
       () => {
         // Upload completed successfully, now we can get the download URL
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          console.log("File available at", downloadURL);
           setImage(downloadURL);
         });
       }
     );
   };
 
-  const addNewPost = () => {
-    console.log(userId);
-    addPost({ userId, text, image });
-    if (isSuccess) {
-      setText("");
-      setFile(null);
-      setImage(null);
+  const imageInputRef = useRef();
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  const addNewPost = async () => {
+    setIsLoading(true);
+    if (text || image) {
+      try {
+        const docRef = await addDoc(collection(db, "posts"), {
+          user: userId,
+          text,
+          createdAt: serverTimestamp(),
+          image,
+          comments: [],
+          likes: [],
+        });
+        let msg = "Post added with ID: " + docRef.id;
+        setIsLoading(false);
+        setText("");
+        setFile(null);
+        setImage(null);
+        imageInputRef.current.value = null;
+        return { data: msg };
+      } catch (error) {
+        console.error(error.message);
+        return { error: error.message };
+      }
     }
-    if (isError) console.log(error);
   };
 
   const deleteImage = () => {
@@ -127,6 +137,7 @@ const NewPost = ({ userId }) => {
         type="file"
         accept="image/jpeg, image/png, image/jpg"
         onChange={uploadPostImage}
+        ref={imageInputRef}
       />
       <div className="btns flex gap-8">
         <button
@@ -147,7 +158,7 @@ const NewPost = ({ userId }) => {
           <button type="button">Drafts</button>
         </div>
       </div>
-      {image && (
+      {image !== null && (
         <div className="w-full flex gap-4">
           <div className="w-56 overflow-hidden rounded-lg">
             <img src={image} className="w-full object-cover" />

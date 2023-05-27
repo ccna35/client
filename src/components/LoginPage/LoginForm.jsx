@@ -2,17 +2,17 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../../firebase/config";
-import { useDispatch } from "react-redux";
-import { getUserId, updateUserStatus } from "../../features/user/userSlice";
+import { useLoginUserMutation } from "../../features/api/apiSlice";
 
 const LoginForm = ({ setCurrentForm }) => {
-  const dispatch = useDispatch();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
 
   const navigate = useNavigate();
+
+  // const [loginUser, { data, isLoading, isSuccess, isError, error }] =
+  //   useLoginUserMutation();
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -21,8 +21,6 @@ const LoginForm = ({ setCurrentForm }) => {
         // Signed in
         const user = userCredential.user;
         setErrorMsg("");
-        dispatch(updateUserStatus(true));
-        dispatch(getUserId(user.uid));
         navigate("/");
         // ...
       })
@@ -31,6 +29,7 @@ const LoginForm = ({ setCurrentForm }) => {
         console.log(error.message);
       });
   };
+
   return (
     <div
       className={`user-form transition-all duration-300 bg-white flex flex-col gap-8 justify-center items-center p-8 $`}

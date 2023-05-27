@@ -8,7 +8,6 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 
 import { auth } from "../../../firebase/config";
 import { useDispatch, useSelector } from "react-redux";
-import { getUserId, updateUserStatus } from "../../../features/user/userSlice";
 import { useEffect, useState } from "react";
 
 const Navbar = () => {
@@ -36,7 +35,6 @@ const Navbar = () => {
     try {
       await signOut(auth);
       navigate("/login");
-      console.log("Sign-out successful.");
     } catch (error) {
       console.log(error);
     }

@@ -4,26 +4,31 @@ import UserInfoBox from "./UserInfoBox";
 import { collection, onSnapshot, query } from "firebase/firestore";
 import { db } from "../../firebase/config";
 import Spinner from "../GlobalComponents/Spinner";
+import { useGetAllUsersQuery } from "../../features/api/apiSlice";
+import { useSelector } from "react-redux";
+import useFetchAllUsers from "../../custom hooks/User/useFetchAllUsers";
+import useCheckUser from "../../custom hooks/User/useCheckUser";
 
 function PeopleToFollow() {
-  const [users, setUsers] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const {
+    isLoading: isLoadingUser,
+    isError: isErrorUser,
+    isSuccess: isSuccessUser,
+    user: currentUser,
+    errorMsg: errorMsgUser,
+  } = useCheckUser();
 
-  useEffect(() => {
-    const q = query(collection(db, "users"));
-    onSnapshot(q, (querySnapshot) => {
-      const usersArray = [];
-      querySnapshot.forEach((doc) => {
-        usersArray.push({ id: doc.id, ...doc.data() });
-      });
-      setUsers([...usersArray]);
-      setIsLoading(false);
-    });
+  if (isErrorUser) {
+    console.log("isErrorUser: ", errorMsgUser);
+    navigate("/login");
+  }
+  const { isLoading, isError, isSuccess, users, errorMsg } = useFetchAllUsers();
 
-    // return () => {
-    //   second
-    // }
-  }, []);
+  if (isError) {
+    console.log(errorMsg);
+  }
+
+  const currentUserData = users?.filter((user) => user.id === currentUser);
 
   return (
     <div className="border border-borderColor rounded-lg p-4 bg-white flex flex-col gap-8">
@@ -31,14 +36,22 @@ function PeopleToFollow() {
       <div className="flex flex-col gap-8">
         {isLoading ? (
           <Spinner />
-        ) : users.length === 0 ? (
+        ) : users?.length === 0 ? (
           <div className="grid place-items-center p-4 border rounded-lg bg-white">
             There are no users to follow :(
           </div>
         ) : (
-          users.map((user) => {
-            return <UserFollow key={user?.id} user={user} />;
-          })
+          users
+            ?.filter((user) => user.id !== currentUser)
+            .map((user) => {
+              return (
+                <UserFollow
+                  key={user?.id}
+                  user={user}
+                  currentUserData={currentUserData}
+                />
+              );
+            })
         )}
       </div>
     </div>

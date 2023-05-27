@@ -2,11 +2,14 @@ import { AiFillLike } from "react-icons/ai";
 import { FaCommentDots, FaShareAlt } from "react-icons/fa";
 import { IoSend } from "react-icons/io5";
 import { MdDelete } from "react-icons/md";
+import { CgSpinner } from "react-icons/cg";
+
 import MyModal from "../../Modals/PictureModal";
 import { Component, useCallback, useEffect, useMemo, useState } from "react";
 import {
   Timestamp,
   addDoc,
+  arrayRemove,
   arrayUnion,
   collection,
   deleteDoc,
@@ -20,53 +23,18 @@ import {
   where,
 } from "firebase/firestore";
 import moment from "moment/moment";
-import useAuth from "../../custom hooks/useAuth";
 import { auth, db } from "../../firebase/config";
 import Comment from "../GlobalComponents/Comment";
 import { v4 as uuidv4 } from "uuid";
 import { motion } from "framer-motion";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { useFetchSingleUserQuery } from "../../features/api/apiSlice";
 import { Link } from "react-router-dom";
 import Spinner from "../GlobalComponents/Spinner";
+import useFetchSingleUser from "../../custom hooks/User/useFetchSingleUser";
+import useCheckUser from "../../custom hooks/User/useCheckUser";
 
 function Post({ post }) {
-  console.log("Post Rendered");
-
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [username, setUsername] = useState("");
-  const [userPhoto, setUserPhoto] = useState(null);
-
-  const [userDetails, setUserDetails] = useState({});
-  const [currentUserDetails, setCurrentUserDetails] = useState({});
-
-  // useEffect(() => {
-  //   const docRef = doc(db, "users", post.user);
-  //   getDoc(docRef)
-  //     .then((data) => data.data())
-  //     .then((data) => {
-  //       setUserDetails({ ...data });
-  //     });
-  // }, [post.user]);
-
-  // const [commentList, setCommentList] = useState([]);
-
-  // useEffect(() => {
-  //   // fetching comments...
-  //   const commentsCol = collection(db, "comments");
-  //   const q = query(commentsCol, where("post", "==", post.id));
-  //   onSnapshot(q, (querySnapshot) => {
-  //     querySnapshot.forEach((doc) => {
-  //       setCommentList((prev) => [...prev, { ...doc.data(), id: doc.id }]);
-  //     });
-  //   });
-  // }, []);
-
-  const { data, isLoading, isSuccess, isError, error } =
-    useFetchSingleUserQuery(post.user);
-
   dayjs.extend(relativeTime);
 
   const timePosted = dayjs().to(
@@ -90,36 +58,54 @@ function Post({ post }) {
     setIsOpen(true);
   }
 
-  const [comment, setComment] = useState("");
+  const [isDeletingPost, setIsDeletingPost] = useState(false);
 
-  const [likes, setLikes] = useState(0);
-
-  const addNewComment = async () => {
+  const deletePost = async (id) => {
+    setIsDeletingPost(true);
     try {
-      const commentsRef = doc(db, "posts", post.id);
-      const updateComments = await updateDoc(commentsRef, {
-        comments: arrayUnion({
-          user: post.user,
-          text: comment,
-          createdAt: new Date().getTime(),
-          id: uuidv4(),
-        }),
-      });
+      const res = await deleteDoc(doc(db, "posts", id));
+      setIsDeletingPost(false);
+      return res;
+    } catch (error) {
+      console.error(error.message);
+      return { error: error.message };
+    }
+  };
 
-      console.log("Document written with ID: ", commentsRef.id);
-      setComment("");
+  const {
+    isLoading,
+    isError: isErrorPosts,
+    isSuccess: isSuccessPosts,
+    user: userInfo,
+    errorMsg: errorMsgPosts,
+  } = useFetchSingleUser(post.user);
+
+  const {
+    isLoading: isLoadingUser,
+    isError: isErrorUser,
+    isSuccess: isSuccessUser,
+    user: currentUser,
+    errorMsg: errorMsgUser,
+  } = useCheckUser();
+
+  const handleLike = async () => {
+    try {
+      const likesRef = doc(db, "posts", post.id);
+      if (post.likes.includes(currentUser)) {
+        await updateDoc(likesRef, {
+          likes: arrayRemove(currentUser),
+        });
+      } else {
+        await updateDoc(likesRef, {
+          likes: arrayUnion(currentUser),
+        });
+      }
     } catch (e) {
       console.error("Error adding document: ", e);
     }
   };
 
-  const handleDelete = async () => {
-    await deleteDoc(doc(db, "posts", post.id));
-  };
-
-  if (isError) {
-    console.log(error);
-  }
+  const didUserLikeThisPost = post.likes?.includes(currentUser);
 
   return (
     <div className="border border-borderColor p-4 rounded-lg bg-white text-textColor flex flex-col gap-4">
@@ -131,30 +117,37 @@ function Post({ post }) {
             <div className="flex gap-4 items-center ">
               <div className="user-img w-12 h-12 rounded-full relative">
                 <div className="w-12 h-12 rounded-full overflow-hidden">
-                  <img src={userPhoto || "../profile/userPhoto.png"} alt="" />
+                  <img
+                    src={userInfo.profilePhoto || "../profile/userPhoto.png"}
+                    alt=""
+                  />
                 </div>
                 <span className="absolute -top-1 -right-1 block w-4 h-4 rounded-full bg-green-600 border border-white"></span>
               </div>
               <div>
                 <div className="user-info flex items-center gap-2">
-                  <Link to={"user/" + post.user}>
+                  <Link to={"/user/" + post.user}>
                     <h3 className="text-textColor transition-colors duration-300 text-base cursor-pointer hover:text-accentColorHover">
                       {isLoading
                         ? "Loading..."
-                        : data.firstName + " " + data.lastName}
+                        : userInfo.firstName + " " + userInfo.lastName}
                     </h3>
                   </Link>
                   <p className="text-secTextColor text-sm">
-                    @{isLoading ? "Loading..." : data.username}
+                    @{isLoading ? "Loading..." : userInfo.username}
                   </p>
                 </div>
                 <p className="text-secTextColor text-xs">{timePosted}</p>
               </div>
             </div>
-            <MdDelete
-              className="text-xl self-start hover:text-accentColorHover transition-colors duration-300 cursor-pointer"
-              onClick={handleDelete}
-            />
+            {currentUser === post.user && isDeletingPost ? (
+              <CgSpinner className="animate-spin text-xl text-accentColor" />
+            ) : (
+              <MdDelete
+                className="text-xl self-start hover:text-accentColorHover transition-colors duration-300 cursor-pointer"
+                onClick={() => deletePost(post.id)}
+              />
+            )}
           </div>
           <p>{post.text}</p>
           {post.image && (
@@ -175,64 +168,27 @@ function Post({ post }) {
           )}
           <div className="interaction-icons flex gap-8 justify-center">
             <div
-              className="cursor-pointer py-2 px-4 bg-secondBgColor rounded-lg flex items-center gap-2 hover:bg-gray-300 transition-colors duration-300"
-              onClick={() => {
-                setLikes((prev) => prev + 1);
-              }}
+              className={`${
+                didUserLikeThisPost
+                  ? "bg-accentColor text-white"
+                  : "bg-secondBgColor text-textColor"
+              } cursor-pointer py-2 px-4 rounded-lg flex gap-2 transition-colors duration-300`}
+              onClick={handleLike}
             >
               <AiFillLike className="text-xl" />
-              <p>{likes}</p>
+              <p>{post.likes?.length}</p>
             </div>
-            <div className="cursor-pointer py-2 px-4 bg-secondBgColor rounded-lg flex items-center gap-2 hover:bg-gray-300 transition-colors duration-300">
-              <FaCommentDots className="text-xl" />
-              <p>{post.comments.length}</p>
-            </div>
-            <div className="cursor-pointer py-2 px-4 bg-secondBgColor rounded-lg flex items-center gap-2 hover:bg-gray-300 transition-colors duration-300">
+            <Link to={`/post/${post.id}`}>
+              <div className="cursor-pointer py-2 px-4 bg-secondBgColor rounded-lg flex items-center gap-2 transition-colors duration-300">
+                <FaCommentDots className="text-xl" />
+                <p>{post.comments.length}</p>
+              </div>
+            </Link>
+            <div className="cursor-pointer py-2 px-4 bg-secondBgColor rounded-lg flex items-center gap-2 transition-colors duration-300">
               <FaShareAlt className="text-xl" />
               <p>0</p>
             </div>
           </div>
-          <hr />
-          <div className="new-comment flex gap-4 items-center">
-            <div className="user-img w-10 h-10 rounded-full overflow-hidden">
-              <img
-                src={
-                  currentUserDetails?.profilePhoto || "../profile/userPhoto.png"
-                }
-                alt=""
-              />
-            </div>
-            <div className="flex-grow flex gap-2 items-center">
-              <input
-                type="text"
-                name="newComment"
-                placeholder="Write a comment..."
-                className=" bg-secondBgColor text-secTextColor rounded-lg text-sm p-2 outline-none flex-grow"
-                value={comment}
-                onChange={(e) => {
-                  setComment(e.target.value);
-                  console.log(e.target.value);
-                }}
-              />
-              <IoSend
-                className="text-accentColor cursor-pointer hover:text-accentColorHover"
-                onClick={addNewComment}
-              />
-            </div>
-          </div>
-          <motion.div
-            layout
-            animate={{ opacity: 1 }}
-            transition={{
-              opacity: { ease: "linear" },
-              layout: { duration: 0.3 },
-            }}
-            className="flex flex-col gap-2"
-          >
-            {post.comments?.map((comment) => {
-              return <Comment comment={comment} key={comment?.id} />;
-            })}
-          </motion.div>
         </>
       )}
     </div>

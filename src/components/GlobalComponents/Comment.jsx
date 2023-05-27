@@ -1,6 +1,7 @@
 import { doc, getDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { db } from "../../firebase/config";
+import { Link } from "react-router-dom";
 
 const Comment = ({ comment }) => {
   const [userDetails, setUserDetails] = useState({});
@@ -15,14 +16,21 @@ const Comment = ({ comment }) => {
   }, [comment.user]);
 
   return (
-    <div className="comment-example grid items-center grid-cols-[1fr,2fr,5fr]">
-      <div className="user-img w-10 h-10 rounded-full overflow-hidden">
-        <img src={comment.profilePhoto || "../profile/userPhoto.png"} alt="" />
+    <div className="comment-example grid items-center grid-cols-7 gap-2">
+      <div className="user-img w-full h-full overflow-hidden col-span-1 flex justify-start items-center">
+        <img
+          src={comment.profilePhoto || "../profile/userPhoto.png"}
+          className="w-7/12 self-start"
+        />
       </div>
-      <h3 className="text-textColor font-medium text-sm">
-        {userDetails.firstName + " " + userDetails.lastName}
-      </h3>
-      <p className="text-textColor text-xs flex-grow">{comment.text}</p>
+      <div className="flex flex-col gap-2 col-span-6 bg-gray-100 p-2 rounded-md">
+        <Link to={"/user/" + comment.user} className="w-fit">
+          <h3 className="text-textColor font-medium text-sm hover:text-accentColorHover transition-colors duration-300 ">
+            {userDetails.firstName + " " + userDetails.lastName}
+          </h3>
+        </Link>
+        <p className="text-textColor text-xs flex-grow">{comment.text}</p>
+      </div>
     </div>
   );
 };

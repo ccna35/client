@@ -13,6 +13,7 @@ import MessagesPage from "./pages/MessagesPage.jsx";
 import { create } from "zustand";
 import { Provider } from "react-redux";
 import { store } from "./app/store.jsx";
+import PostPage from "./pages/PostPage.jsx";
 
 const router = createBrowserRouter([
   {
@@ -23,6 +24,14 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: <HomePage />,
+      },
+      {
+        path: "/user/:id",
+        element: <ProfilePage />,
+      },
+      {
+        path: "/post/:id",
+        element: <PostPage />,
       },
       {
         path: "/user/:id",

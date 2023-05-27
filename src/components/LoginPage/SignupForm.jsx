@@ -6,23 +6,28 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth, db } from "../../firebase/config";
 import { useDispatch } from "react-redux";
-import { getUserId, updateUserStatus } from "../../features/user/userSlice";
+import {
+  getCurrentUser,
+  updateUserStatus,
+} from "../../features/user/userSlice";
+import { useRegisterUserMutation } from "../../features/api/apiSlice";
 
 const SignupForm = ({ setCurrentForm }) => {
-  const dispatch = useDispatch();
-
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
 
   const handleSignUp = (e) => {
+    setIsLoading(true);
     e.preventDefault();
     if (password !== confirmPassword) console.log("Passwords don't match");
+
     createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         // Signed in
@@ -39,9 +44,6 @@ const SignupForm = ({ setCurrentForm }) => {
           following: [],
           followers: [],
         });
-        console.log(user);
-        dispatch(updateUserStatus(true));
-        dispatch(getUserId(user.uid));
         navigate("/");
         // ...
       })
@@ -50,7 +52,6 @@ const SignupForm = ({ setCurrentForm }) => {
         console.log(errorCode);
         const errorMessage = error.message;
         console.log(errorMessage);
-        // ..
       });
   };
   return (
@@ -117,7 +118,7 @@ const SignupForm = ({ setCurrentForm }) => {
         />
         <input
           type="submit"
-          value="Sign up"
+          value={isLoading ? "Signing up..." : "Sign up"}
           className="p-2 text-sm bg-accentColor text-textColorLight rounded cursor-pointer hover:bg-accentColorHover transition-colors duration-300"
           onClick={handleSignUp}
         />

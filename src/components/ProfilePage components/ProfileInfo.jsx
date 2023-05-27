@@ -1,16 +1,19 @@
 import { useState } from "react";
 import MyModal from "../../Modals/PictureModal";
 import { useLocation, useParams } from "react-router-dom";
-import { useFetchSingleUserQuery } from "../../features/api/apiSlice";
 import Spinner from "../GlobalComponents/Spinner";
+import useFetchSingleUser from "../../custom hooks/User/useFetchSingleUser";
 
-const ProfileInfo = () => {
+const ProfileInfo = ({ currentUser }) => {
   const { id } = useParams();
 
-  const { data, isLoading, isSuccess, isError, error } =
-    useFetchSingleUserQuery(id);
-
-  console.log(data);
+  const {
+    isLoading,
+    isError,
+    isSuccess,
+    user: userInfo,
+    errorMsg,
+  } = useFetchSingleUser(id);
 
   let [isOpen, setIsOpen] = useState(false);
 
@@ -28,7 +31,7 @@ const ProfileInfo = () => {
     return <Spinner />;
   }
 
-  const userPhoto = data.profilePhoto || "../profile/userPhoto.png";
+  const userPhoto = userInfo.profilePhoto || "../profile/userPhoto.png";
 
   return (
     <div className="profile-info rounded-lg py-4 px-8 bg-white flex justify-between items-start">
@@ -46,23 +49,23 @@ const ProfileInfo = () => {
           </div>
           <div className="user-info flex flex-col">
             <h3 className="text-accentColor hover:text-accentColorHover transition-colors duration-300 text-lg">
-              {data?.firstName + " " + data?.lastName}
+              {userInfo?.firstName + " " + userInfo?.lastName}
             </h3>
-            <p className="text-secTextColor text-sm">@{data.username}</p>
+            <p className="text-secTextColor text-sm">@{userInfo.username}</p>
           </div>
         </div>
         <div className="follow-group flex gap-8 items-center">
           <p>
-            <span className="font-medium">{data?.followers?.length}</span>{" "}
+            <span className="font-medium">{userInfo?.followers?.length}</span>{" "}
             <span className="text-secTextColor text-sm">Followers</span>
           </p>
           <p>
-            <span className="font-medium">{data?.following?.length}</span>{" "}
+            <span className="font-medium">{userInfo?.following?.length}</span>{" "}
             <span className="text-secTextColor text-sm">Following</span>
           </p>
         </div>
       </div>
-      {location.pathname === "/profile" ? (
+      {currentUser === id ? (
         <button
           type="button"
           className="py-2 px-4 bg-secondBgColor rounded-lg flex items-center gap-2 hover:bg-gray-300 transition-colors duration-300"
