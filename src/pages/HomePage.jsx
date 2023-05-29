@@ -4,6 +4,8 @@ import Post from "../components/HomePage Components/Post";
 import Spinner from "../components/GlobalComponents/Spinner";
 import useFetchPosts from "../custom hooks/Post/useFetchPosts";
 import useCheckUser from "../custom hooks/User/useCheckUser";
+import useFetchSingleUser from "../custom hooks/User/useFetchSingleUser";
+import useFetchAllPosts from "../custom hooks/Post/useFetchAllPosts";
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -21,13 +23,28 @@ const HomePage = () => {
     navigate("/login");
   }
 
+  // if (isSuccessUser) {
+  //   console.log(currentUser);
+  // }
+
+  // const {
+  //   isLoading,
+  //   isError: isErrorUserInfo,
+  //   isSuccess: isSuccessUserInfo,
+  //   user: userInfo,
+  //   errorMsg: errorMsgUserInfo,
+  // } = useFetchSingleUser(currentUser);
+
+  // console.log(currentUser);
+  // console.log(userInfo);
+
   const {
     isLoading: isLoadingPosts,
     isError: isErrorPosts,
     isSuccess: isSuccessPosts,
     posts,
     errorMsg: errorMsgPosts,
-  } = useFetchPosts(currentUser);
+  } = useFetchAllPosts(currentUser);
 
   return (
     <div className="lg:col-start-3 lg:col-span-4 flex flex-col gap-8 mx-auto max-w-xl lg:mx-0">

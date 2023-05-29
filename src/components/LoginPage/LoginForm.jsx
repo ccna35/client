@@ -8,13 +8,12 @@ const LoginForm = ({ setCurrentForm }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
 
-  // const [loginUser, { data, isLoading, isSuccess, isError, error }] =
-  //   useLoginUserMutation();
-
   const handleLogin = (e) => {
+    setIsLoading(true);
     e.preventDefault();
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
@@ -22,11 +21,12 @@ const LoginForm = ({ setCurrentForm }) => {
         const user = userCredential.user;
         setErrorMsg("");
         navigate("/");
-        // ...
+        setIsLoading(false);
       })
       .catch((error) => {
         setErrorMsg(error.message);
         console.log(error.message);
+        setIsLoading(false);
       });
   };
 

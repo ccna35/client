@@ -46,8 +46,6 @@ function Post({ post }) {
     )
   );
 
-  // const timePosted = "a few seconds ago";
-
   let [isOpen, setIsOpen] = useState(false);
 
   function closeModal() {

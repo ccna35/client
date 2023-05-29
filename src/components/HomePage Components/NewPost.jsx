@@ -1,8 +1,7 @@
-import { IoDocumentsSharp } from "react-icons/io5";
+import { IoDocumentsSharp, IoCloseCircleSharp } from "react-icons/io5";
 import { db } from "../../firebase/config";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { useRef, useState } from "react";
-import { useAddPostMutation } from "../../features/api/apiSlice";
 import {
   getStorage,
   ref,
@@ -133,7 +132,15 @@ const NewPost = ({ userId }) => {
         value={text}
         onChange={(e) => setText(e.target.value)}
       />
+      {/* <input
+        type="file"
+        accept="image/jpeg, image/png, image/jpg"
+        onChange={uploadPostImage}
+        ref={imageInputRef}
+      /> */}
       <input
+        className="relative m-0 block w-fit min-w-0 flex-auto cursor-pointer rounded border border-solid border-neutral-300 bg-clip-padding px-3 py-[0.32rem] text-xs font-normal text-neutral-700 transition duration-300 ease-in-out file:-mx-3 file:-my-[0.32rem] file:cursor-pointer file:overflow-hidden file:rounded-none file:border-0 file:border-solid file:border-inherit file:bg-neutral-100 file:px-3 file:py-[0.32rem] file:text-neutral-700 file:transition file:duration-150 file:ease-in-out file:[border-inline-end-width:1px] file:[margin-inline-end:0.75rem] hover:file:bg-neutral-200 focus:border-primary focus:text-neutral-700 focus:shadow-te-primary focus:outline-none"
+        id="formFileSm"
         type="file"
         accept="image/jpeg, image/png, image/jpg"
         onChange={uploadPostImage}
@@ -164,10 +171,12 @@ const NewPost = ({ userId }) => {
             <img src={image} className="w-full object-cover" />
           </div>
           <div
-            className="w-8 h-8 rounded-lg bg-blue-400 grid place-items-center hover:bg-slate-400 transition-colors duration-300 cursor-pointer"
+            className="grid place-items-center items-start"
             onClick={deleteImage}
           >
-            <button className="text-white">X</button>
+            <button className="text-accentColor text-3xl cursor-pointer transition-colors duration-300 hover:text-accentColorHover">
+              <IoCloseCircleSharp />
+            </button>
           </div>
         </div>
       )}

@@ -121,6 +121,7 @@ const SignupForm = ({ setCurrentForm }) => {
           value={isLoading ? "Signing up..." : "Sign up"}
           className="p-2 text-sm bg-accentColor text-textColorLight rounded cursor-pointer hover:bg-accentColorHover transition-colors duration-300"
           onClick={handleSignUp}
+          disabled={isLoading}
         />
       </form>
     </div>

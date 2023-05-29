@@ -1,4 +1,4 @@
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, onSnapshot } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { db } from "../../firebase/config";
 
@@ -10,30 +10,17 @@ const useFetchSingleUser = (id) => {
   const [user, setUser] = useState({});
 
   useEffect(() => {
-    const fetchUser = async () => {
-      if (id === null || id === undefined) return;
-      const docRef = doc(db, "users", id);
-      const docSnap = await getDoc(docRef);
+    if (id === null || id === undefined) return;
+    const docRef = doc(db, "users", id);
+    const unsubscribe = onSnapshot(docRef, (doc) => {
+      setUser({ ...doc.data() });
+      setIsSuccess(true);
+      setIsLoading(false);
+    });
 
-      if (docSnap.exists()) {
-        setUser({ ...docSnap.data() });
-        setIsSuccess(true);
-        setIsLoading(false);
-      } else {
-        // docSnap.data() will be undefined in this case
-        console.log("No such document!");
-        setIsError(true);
-        setErrorMsg("No such document!");
-        setIsSuccess(false);
-        setIsLoading(false);
-      }
+    return () => {
+      unsubscribe();
     };
-
-    fetchUser();
-
-    // return () => {
-    //   unsubscribe();
-    // };
   }, [id]);
   return { isLoading, isError, isSuccess, user, errorMsg };
 };

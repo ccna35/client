@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 import { db } from "../../firebase/config";
 
 function UserFollow({ user, currentUserData }) {
-  console.log(currentUserData[0]);
   const userPhoto = user.profilePhoto || "../profile/userPhoto.png";
 
   const [doIFollowThisUser, setDoIFollowThisUser] = useState(false);
@@ -57,10 +56,14 @@ function UserFollow({ user, currentUserData }) {
       </div>
       <button
         type="button"
-        className="py-2 px-4 text-white rounded-lg bg-accentColor hover:bg-accentColorHover transition-colors duration-300"
+        className={`${
+          currentUserData[0].following.includes(user.id)
+            ? "bg-secondBgColor text-textColor"
+            : "bg-accentColor text-white"
+        } py-2 px-4 rounded-lg hover:bg-accentColorHover hover:text-white transition-colors duration-300`}
         onClick={handleFollow}
       >
-        {doIFollowThisUser ? "Unfollow" : "Follow"}
+        {currentUserData[0].following.includes(user.id) ? "Unfollow" : "Follow"}
       </button>
     </div>
   );

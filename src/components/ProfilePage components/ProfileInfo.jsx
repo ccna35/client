@@ -3,6 +3,7 @@ import MyModal from "../../Modals/PictureModal";
 import { useLocation, useParams } from "react-router-dom";
 import Spinner from "../GlobalComponents/Spinner";
 import useFetchSingleUser from "../../custom hooks/User/useFetchSingleUser";
+import EditProfileModal from "../../Modals/EditProfileModal";
 
 const ProfileInfo = ({ currentUser }) => {
   const { id } = useParams();
@@ -17,6 +18,7 @@ const ProfileInfo = ({ currentUser }) => {
 
   let [isOpen, setIsOpen] = useState(false);
 
+  // Controls the user image modal.
   function closeModal() {
     setIsOpen(false);
   }
@@ -25,7 +27,16 @@ const ProfileInfo = ({ currentUser }) => {
     setIsOpen(true);
   }
 
-  let location = useLocation();
+  let [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
+
+  // Controls the Edit Profile modal.
+  function closeEditProfileModal() {
+    setIsEditProfileOpen(false);
+  }
+
+  function openEditProfileModal() {
+    setIsEditProfileOpen(true);
+  }
 
   if (isLoading) {
     return <Spinner />;
@@ -34,7 +45,7 @@ const ProfileInfo = ({ currentUser }) => {
   const userPhoto = userInfo.profilePhoto || "../profile/userPhoto.png";
 
   return (
-    <div className="profile-info rounded-lg py-4 px-8 bg-white flex justify-between items-start">
+    <div className="profile-info rounded-lg p-4 bg-white flex justify-between items-start">
       <div className="flex flex-col gap-8">
         <div className="flex gap-4 items-center">
           <div className="user-img w-16 h-16 rounded-full overflow-hidden cursor-pointer">
@@ -69,6 +80,7 @@ const ProfileInfo = ({ currentUser }) => {
         <button
           type="button"
           className="py-2 px-4 bg-secondBgColor rounded-lg flex items-center gap-2 hover:bg-gray-300 transition-colors duration-300"
+          onClick={openEditProfileModal}
         >
           Edit Profile
         </button>
@@ -80,6 +92,13 @@ const ProfileInfo = ({ currentUser }) => {
           Follow
         </button>
       )}
+      <EditProfileModal
+        isEditProfileOpen={isEditProfileOpen}
+        setIsEditProfileOpen={setIsEditProfileOpen}
+        closeEditProfileModal={closeEditProfileModal}
+        openEditProfileModal={openEditProfileModal}
+        userInfo={{ id, ...userInfo }}
+      />
     </div>
   );
 };
