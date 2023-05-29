@@ -1,14 +1,8 @@
-import { onAuthStateChanged } from "firebase/auth";
 import Cover from "../components/ProfilePage components/Cover";
 import ProfileInfo from "../components/ProfilePage components/ProfileInfo";
-import Tabs from "../components/ProfilePage components/Tabs";
-import { auth, db } from "../firebase/config";
-import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { useNavigate, useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
 import Spinner from "../components/GlobalComponents/Spinner";
 import Post from "../components/HomePage Components/Post";
-import { useGetPostsQuery } from "../features/api/apiSlice";
 import useCheckUser from "../custom hooks/User/useCheckUser";
 import useFetchPosts from "../custom hooks/Post/useFetchPosts";
 

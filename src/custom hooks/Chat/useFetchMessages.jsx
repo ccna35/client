@@ -8,7 +8,7 @@ import {
 import { db } from "../../firebase/config";
 import { useEffect, useState } from "react";
 
-const useFetchMessages = (docRefId) => {
+const useFetchMessages = (docRefId = "Lzu8V0OTYjAyrLMmZ1sI") => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isError, setIsError] = useState(false);

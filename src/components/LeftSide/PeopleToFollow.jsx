@@ -1,15 +1,11 @@
-import { useEffect, useState } from "react";
 import UserFollow from "./UserFollow";
-import UserInfoBox from "./UserInfoBox";
-import { collection, onSnapshot, query } from "firebase/firestore";
-import { db } from "../../firebase/config";
 import Spinner from "../GlobalComponents/Spinner";
-import { useGetAllUsersQuery } from "../../features/api/apiSlice";
-import { useSelector } from "react-redux";
 import useFetchAllUsers from "../../custom hooks/User/useFetchAllUsers";
 import useCheckUser from "../../custom hooks/User/useCheckUser";
+import { useNavigate } from "react-router-dom";
 
 function PeopleToFollow() {
+  const navigate = useNavigate();
   const {
     isLoading: isLoadingUser,
     isError: isErrorUser,

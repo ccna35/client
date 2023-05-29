@@ -52,7 +52,7 @@ const Navbar = () => {
         </NavLink>
         <SearchInput />
         <NavLink
-          to={"user/" + userId}
+          to={"/user/" + userId}
           className="py-2 px-4 bg-secondBgColor rounded-lg flex items-center gap-2 hover:bg-gray-300 transition-colors duration-300"
         >
           <FaUserAlt />

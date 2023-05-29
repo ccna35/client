@@ -1,16 +1,9 @@
 import { createUserWithEmailAndPassword } from "firebase/auth";
 // import { doc, setDoc } from "firebase/firestore/lite";
 import { doc, setDoc } from "firebase/firestore";
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth, db } from "../../firebase/config";
-import { useDispatch } from "react-redux";
-import {
-  getCurrentUser,
-  updateUserStatus,
-} from "../../features/user/userSlice";
-import { useRegisterUserMutation } from "../../features/api/apiSlice";
 
 const SignupForm = ({ setCurrentForm }) => {
   const [firstName, setFirstName] = useState("");

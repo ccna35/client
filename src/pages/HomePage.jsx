@@ -23,21 +23,6 @@ const HomePage = () => {
     navigate("/login");
   }
 
-  // if (isSuccessUser) {
-  //   console.log(currentUser);
-  // }
-
-  // const {
-  //   isLoading,
-  //   isError: isErrorUserInfo,
-  //   isSuccess: isSuccessUserInfo,
-  //   user: userInfo,
-  //   errorMsg: errorMsgUserInfo,
-  // } = useFetchSingleUser(currentUser);
-
-  // console.log(currentUser);
-  // console.log(userInfo);
-
   const {
     isLoading: isLoadingPosts,
     isError: isErrorPosts,

@@ -2,7 +2,6 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../../firebase/config";
-import { useLoginUserMutation } from "../../features/api/apiSlice";
 
 const LoginForm = ({ setCurrentForm }) => {
   const [email, setEmail] = useState("");

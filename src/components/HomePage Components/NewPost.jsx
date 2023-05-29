@@ -1,4 +1,5 @@
 import { IoDocumentsSharp, IoCloseCircleSharp } from "react-icons/io5";
+import { FaRegSmileBeam } from "react-icons/fa";
 import { db } from "../../firebase/config";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { useRef, useState } from "react";
@@ -9,6 +10,8 @@ import {
   getDownloadURL,
   deleteObject,
 } from "firebase/storage";
+import data from "@emoji-mart/data";
+import Picker from "@emoji-mart/react";
 
 const NewPost = ({ userId }) => {
   const [text, setText] = useState("");
@@ -79,8 +82,9 @@ const NewPost = ({ userId }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const addNewPost = async () => {
-    setIsLoading(true);
     if (text || image) {
+      setIsLoading(true);
+
       try {
         const docRef = await addDoc(collection(db, "posts"), {
           user: userId,
@@ -121,23 +125,42 @@ const NewPost = ({ userId }) => {
       });
   };
 
+  const [isVisible, setIsVisible] = useState(false);
+
   return (
     <div className="flex flex-col gap-4">
-      <textarea
-        name="post"
-        placeholder="What’s on your mind?"
-        id=""
-        maxLength={280}
-        className="border border-borderColor rounded-lg p-4 outline-none focus:border-accentColor transition-colors duration-300"
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-      />
-      {/* <input
-        type="file"
-        accept="image/jpeg, image/png, image/jpg"
-        onChange={uploadPostImage}
-        ref={imageInputRef}
-      /> */}
+      <div className="relative">
+        <div className="absolute right-4 bottom-4">
+          <FaRegSmileBeam
+            className="text-orange-500 text-xl"
+            onClick={() => {
+              setIsVisible(true);
+              console.log(isVisible);
+            }}
+          />
+          {isVisible && (
+            <Picker
+              previewPosition="none"
+              data={data}
+              onEmojiSelect={(e) => {
+                setText((prev) => prev + e.native);
+                setIsVisible(false);
+              }}
+            />
+          )}
+        </div>
+
+        <textarea
+          name="post"
+          placeholder="What’s on your mind?"
+          id=""
+          maxLength={280}
+          className="border border-borderColor rounded-lg p-4 outline-none focus:border-accentColor transition-colors duration-300 w-full"
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+        />
+      </div>
+
       <input
         className="relative m-0 block w-fit min-w-0 flex-auto cursor-pointer rounded border border-solid border-neutral-300 bg-clip-padding px-3 py-[0.32rem] text-xs font-normal text-neutral-700 transition duration-300 ease-in-out file:-mx-3 file:-my-[0.32rem] file:cursor-pointer file:overflow-hidden file:rounded-none file:border-0 file:border-solid file:border-inherit file:bg-neutral-100 file:px-3 file:py-[0.32rem] file:text-neutral-700 file:transition file:duration-150 file:ease-in-out file:[border-inline-end-width:1px] file:[margin-inline-end:0.75rem] hover:file:bg-neutral-200 focus:border-primary focus:text-neutral-700 focus:shadow-te-primary focus:outline-none"
         id="formFileSm"
