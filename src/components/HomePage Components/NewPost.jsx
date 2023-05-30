@@ -12,117 +12,123 @@ import {
 } from "firebase/storage";
 import data from "@emoji-mart/data";
 import Picker from "@emoji-mart/react";
+import Spinner from "../GlobalComponents/Spinner";
 
 const NewPost = ({ userId }) => {
-  const [text, setText] = useState("");
-  const [file, setFile] = useState(null);
-  const [image, setImage] = useState(null);
+  // Handling cover photo
+  const [selectedPostImage, setSelectedPostImage] = useState(null);
 
-  const storage = getStorage();
+  const postImgRef = useRef();
 
-  const uploadPostImage = (e) => {
-    let file = e.target.files[0];
-
-    setFile(e.target.files[0]);
-
-    // Create the file metadata
-    const metadata = {
-      contentType: file.type,
-    };
-
-    // Upload file and metadata to the object 'images/mountains.jpg'
-    const storageRef = ref(storage, "images/" + file.name);
-    const uploadTask = uploadBytesResumable(storageRef, file, metadata);
-
-    // Listen for state changes, errors, and completion of the upload.
-    uploadTask.on(
-      "state_changed",
-      (snapshot) => {
-        // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-        const progress =
-          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        switch (snapshot.state) {
-          case "paused":
-            console.log("Upload is paused");
-            break;
-          case "running":
-            console.log("Upload is running");
-            break;
-        }
-      },
-      (error) => {
-        // A full list of error codes is available at
-        // https://firebase.google.com/docs/storage/web/handle-errors
-        switch (error.code) {
-          case "storage/unauthorized":
-            // User doesn't have permission to access the object
-            break;
-          case "storage/canceled":
-            // User canceled the upload
-            break;
-
-          // ...
-
-          case "storage/unknown":
-            // Unknown error occurred, inspect error.serverResponse
-            break;
-        }
-      },
-      () => {
-        // Upload completed successfully, now we can get the download URL
-        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          setImage(downloadURL);
-        });
-      }
-    );
-  };
-
-  const imageInputRef = useRef();
-
-  const [isLoading, setIsLoading] = useState(false);
-
-  const addNewPost = async () => {
-    if (text || image) {
-      setIsLoading(true);
-
-      try {
-        const docRef = await addDoc(collection(db, "posts"), {
-          user: userId,
-          text,
-          createdAt: serverTimestamp(),
-          image,
-          comments: [],
-          likes: [],
-        });
-        let msg = "Post added with ID: " + docRef.id;
-        setIsLoading(false);
-        setText("");
-        setFile(null);
-        setImage(null);
-        imageInputRef.current.value = null;
-        return { data: msg };
-      } catch (error) {
-        console.error(error.message);
-        return { error: error.message };
-      }
+  // Handles selecting post image.
+  const postImageChange = (e) => {
+    if (e.target.files && e.target.files.length > 0) {
+      console.log(e.target.files[0].name);
+      setSelectedPostImage(e.target.files[0]);
     }
   };
 
-  const deleteImage = () => {
-    // Create a reference to the file to delete
-    const desertRef = ref(storage, "images/" + file.name);
+  // This function will be triggered when the "Remove This Image" button is clicked
+  const removeSelectedPostImage = () => {
+    setSelectedPostImage(null);
+    postImgRef.current.value = "";
+  };
 
-    // Delete the file
-    deleteObject(desertRef)
-      .then((data) => {
-        // File deleted successfully
-        console.log(data);
-        setImage("");
-      })
-      .catch((error) => {
-        // Uh-oh, an error occurred!
-        console.log(error);
+  const [text, setText] = useState("");
+  const [file, setFile] = useState(null);
+  const [imageLink, setImageLink] = useState(null);
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [progress, setProgress] = useState(0);
+
+  const storage = getStorage();
+
+  const uploadPostImage = () => {
+    if (text || selectedPostImage) {
+      setIsLoading(true);
+
+      // let file = e.target.files[0];
+
+      // setFile(e.target.files[0]);
+
+      // Create the file metadata
+      const metadata = {
+        contentType: selectedPostImage.type,
+      };
+
+      // Upload file and metadata to the object 'images/mountains.jpg'
+      const storageRef = ref(storage, "images/" + selectedPostImage.name);
+      const uploadTask = uploadBytesResumable(
+        storageRef,
+        selectedPostImage,
+        metadata
+      );
+
+      // Listen for state changes, errors, and completion of the upload.
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+          const progress = Math.floor(
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+          );
+          setProgress(progress);
+          switch (snapshot.state) {
+            case "paused":
+              console.log("Upload is paused");
+              break;
+            case "running":
+              console.log("Upload is running");
+              break;
+          }
+        },
+        (error) => {
+          // A full list of error codes is available at
+          // https://firebase.google.com/docs/storage/web/handle-errors
+          switch (error.code) {
+            case "storage/unauthorized":
+              // User doesn't have permission to access the object
+              break;
+            case "storage/canceled":
+              // User canceled the upload
+              break;
+
+            // ...
+
+            case "storage/unknown":
+              // Unknown error occurred, inspect error.serverResponse
+              break;
+          }
+        },
+        () => {
+          // Upload completed successfully, now we can get the download URL
+          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+            addNewPost(downloadURL);
+          });
+        }
+      );
+    }
+  };
+
+  const addNewPost = async (downloadURL) => {
+    try {
+      const docRef = await addDoc(collection(db, "posts"), {
+        user: userId,
+        text,
+        createdAt: serverTimestamp(),
+        image: downloadURL,
+        comments: [],
+        likes: [],
       });
+      let msg = "Post added with ID: " + docRef.id;
+      setIsLoading(false);
+      setText("");
+      removeSelectedPostImage();
+      return { data: msg };
+    } catch (error) {
+      console.error(error.message);
+      return { error: error.message };
+    }
   };
 
   const [isVisible, setIsVisible] = useState(false);
@@ -166,16 +172,18 @@ const NewPost = ({ userId }) => {
         id="formFileSm"
         type="file"
         accept="image/jpeg, image/png, image/jpg"
-        onChange={uploadPostImage}
-        ref={imageInputRef}
+        onChange={postImageChange}
+        ref={postImgRef}
       />
       <div className="btns flex gap-8">
         <button
           type="button"
-          className="py-2 px-4 text-white rounded-lg bg-accentColor hover:bg-accentColorHover transition-colors duration-300"
-          onClick={addNewPost}
+          className="py-2 px-4 text-white rounded-lg bg-accentColor hover:bg-accentColorHover transition-colors duration-300 flex gap-2"
+          onClick={uploadPostImage}
+          disabled={isLoading}
         >
-          {isLoading ? "Loading..." : "Post"}
+          {isLoading && <p>{progress} %</p>}
+          <p>{isLoading ? "Uploading" : "Post"}</p>
         </button>
         <button
           type="button"
@@ -188,14 +196,17 @@ const NewPost = ({ userId }) => {
           <button type="button">Drafts</button>
         </div>
       </div>
-      {image !== null && (
+      {selectedPostImage && (
         <div className="w-full flex gap-4">
           <div className="w-56 overflow-hidden rounded-lg">
-            <img src={image} className="w-full object-cover" />
+            <img
+              src={URL.createObjectURL(selectedPostImage)}
+              className="w-full object-cover"
+            />
           </div>
           <div
             className="grid place-items-center items-start"
-            onClick={deleteImage}
+            onClick={removeSelectedPostImage}
           >
             <button className="text-accentColor text-3xl cursor-pointer transition-colors duration-300 hover:text-accentColorHover">
               <IoCloseCircleSharp />

@@ -113,10 +113,8 @@ export default function EditProfileModal({
 
   // This function handles the cancel button
   const handleCancelBtn = () => {
-    setSelectedCoverImage(null);
-    coverImgRef.current.value = "";
-    setSelectedProfileImage(null);
-    profileImgRef.current.value = "";
+    removeSelectedCoverImage();
+    removeSelectedProfileImage();
     closeEditProfileModal();
   };
 
@@ -287,7 +285,7 @@ export default function EditProfileModal({
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="bg-white rounded-sm p-4 w-full max-h-[37rem] max-w-xl transform overflow-hidden text-left align-middle shadow-xl transition-all">
+                <Dialog.Panel className="bg-white rounded-sm p-4 w-full max-w-xl transform overflow-hidden text-left align-middle shadow-xl transition-all">
                   <form
                     className="flex flex-col gap-8 text-left"
                     onSubmit={handleSubmit}
