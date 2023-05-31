@@ -2,6 +2,7 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../../firebase/config";
+import { useFormik } from "formik";
 
 const LoginForm = ({ setCurrentForm }) => {
   const [email, setEmail] = useState("");
@@ -11,9 +12,10 @@ const LoginForm = ({ setCurrentForm }) => {
 
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = (values) => {
+    const { password, email } = values;
+
     setIsLoading(true);
-    e.preventDefault();
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         // Signed in
@@ -29,6 +31,35 @@ const LoginForm = ({ setCurrentForm }) => {
       });
   };
 
+  const validate = (values) => {
+    const errors = {};
+
+    if (!values.email) {
+      errors.email = "Required";
+    } else if (
+      !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)
+    ) {
+      errors.email = "Invalid email address";
+    }
+
+    if (!values.password) {
+      errors.password = "Required";
+    }
+
+    return errors;
+  };
+
+  const formik = useFormik({
+    initialValues: {
+      email: "",
+      password: "",
+    },
+    validate,
+    onSubmit: (values) => {
+      return handleLogin(values);
+    },
+  });
+
   return (
     <div
       className={`user-form transition-all duration-300 bg-white flex flex-col gap-8 justify-center items-center p-8 $`}
@@ -43,25 +74,39 @@ const LoginForm = ({ setCurrentForm }) => {
         </span>
       </div>
       <form
-        action=""
         className="flex flex-col gap-8 justify-center w-3/4 xl:w-1/2"
+        onSubmit={formik.handleSubmit}
       >
-        <input
-          type="email"
-          name="email"
-          required
-          placeholder="Enter your email..."
-          className="p-2 text-sm rounded outline-none shadow-sm border border-borderColor focus:border-accentColor transition-colors duration-300"
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <input
-          type="password"
-          name="password"
-          required
-          placeholder="Enter your password..."
-          className="p-2 text-sm rounded outline-none shadow-sm border border-borderColor focus:border-accentColor transition-colors duration-300"
-          onChange={(e) => setPassword(e.target.value)}
-        />
+        <div className="flex flex-col gap-2">
+          <input
+            type="email"
+            name="email"
+            placeholder="Enter your email..."
+            className="p-2 text-sm rounded outline-none shadow-sm border border-borderColor focus:border-accentColor transition-colors duration-300"
+            required
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            value={formik.values.email}
+          />
+          {formik.errors.email && formik.touched.email && (
+            <p className="text-red-600 text-sm">{formik.errors.email}</p>
+          )}
+        </div>
+        <div className="flex flex-col gap-2">
+          <input
+            type="password"
+            name="password"
+            placeholder="Enter your password..."
+            className="p-2 text-sm rounded outline-none shadow-sm border border-borderColor focus:border-accentColor transition-colors duration-300"
+            required
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            value={formik.values.password}
+          />
+          {formik.errors.password && formik.touched.password && (
+            <p className="text-red-600 text-sm">{formik.errors.password}</p>
+          )}
+        </div>
         {errorMsg && (
           <div className="py-2 px-4 rounded-lg border border-red-500 bg-red-100 text-red-700 text-sm">
             {errorMsg}
@@ -72,7 +117,6 @@ const LoginForm = ({ setCurrentForm }) => {
           type="submit"
           value="Login"
           className="p-2 text-sm bg-accentColor text-textColorLight rounded cursor-pointer hover:bg-accentColorHover transition-colors duration-300"
-          onClick={handleLogin}
         />
       </form>
     </div>

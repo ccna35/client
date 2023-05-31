@@ -17,10 +17,10 @@ const Comment = ({ comment }) => {
 
   return (
     <div className="comment-example grid items-center grid-cols-7 gap-2">
-      <div className="user-img w-full h-full overflow-hidden col-span-1 flex justify-start items-center">
+      <div className="user-img w-10 h-10 overflow-hidden col-span-1 flex justify-start items-center rounded-full">
         <img
-          src={comment.profilePhoto || "../profile/userPhoto.png"}
-          className="w-7/12 self-start"
+          src={userDetails.profilePhoto || "../profile/userPhoto.png"}
+          className="w-full h-full object-cover self-start"
         />
       </div>
       <div className="flex flex-col gap-2 col-span-6 bg-gray-100 p-2 rounded-md">

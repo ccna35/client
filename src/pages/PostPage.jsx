@@ -61,13 +61,9 @@ const PostPage = () => {
     )
   );
 
-  const {
-    isLoading,
-    isError: isErrorUserInfo,
-    isSuccess: isSuccessUserInfo,
-    user: userInfo,
-    errorMsg: errorMsgUserInfo,
-  } = useFetchSingleUser(post.user);
+  const { user: userInfo } = useFetchSingleUser(post.user);
+
+  const { user: myUserInfo } = useFetchSingleUser(currentUser);
 
   const [comment, setComment] = useState("");
 
@@ -154,14 +150,6 @@ const PostPage = () => {
                 <p className="text-secTextColor text-xs">{timePosted}</p>
               </div>
             </div>
-            {/* {isDeletingPost ? (
-              <CgSpinner className="animate-spin text-xl text-accentColor" />
-            ) : (
-              <MdDelete
-                className="text-xl self-start hover:text-accentColorHover transition-colors duration-300 cursor-pointer"
-                onClick={() => deletePost(post.id)}
-              />
-            )} */}
           </div>
           <p>{post.text}</p>
           {post.image && (
@@ -205,7 +193,7 @@ const PostPage = () => {
           <div className="new-comment flex gap-4 items-center">
             <div className="user-img w-10 h-10 rounded-full overflow-hidden">
               <img
-                src={userInfo?.profilePhoto || "../profile/userPhoto.png"}
+                src={myUserInfo?.profilePhoto || "../profile/userPhoto.png"}
                 alt=""
               />
             </div>

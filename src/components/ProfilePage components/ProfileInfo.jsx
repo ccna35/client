@@ -1,11 +1,33 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import MyModal from "../../Modals/PictureModal";
 import { useLocation, useParams } from "react-router-dom";
 import Spinner from "../GlobalComponents/Spinner";
 import useFetchSingleUser from "../../custom hooks/User/useFetchSingleUser";
 import EditProfileModal from "../../Modals/EditProfileModal";
+import useFetchSpecificUsers from "../../custom hooks/User/useFetchSpecificUsers";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  getDoc,
+  doc,
+} from "firebase/firestore";
+import { db } from "../../firebase/config";
+import useFetchAllUsers from "../../custom hooks/User/useFetchAllUsers";
+import UsersModal from "../../Modals/UserModal";
 
 const ProfileInfo = ({ currentUser }) => {
+  const [isUsersModalOpen, setIsUsersModalOpen] = useState(false);
+
+  function closeUsersModal() {
+    setIsUsersModalOpen(false);
+  }
+
+  function openUsersModal() {
+    setIsUsersModalOpen(true);
+  }
+
   const { id } = useParams();
 
   const {
@@ -15,6 +37,37 @@ const ProfileInfo = ({ currentUser }) => {
     user: userInfo,
     errorMsg,
   } = useFetchSingleUser(id);
+
+  const {
+    isLoading: isLoadingUsers,
+    isError: isErrorUsers,
+    isSuccess: isSuccessUsers,
+    users,
+    errorMsg: errorMsgUsers,
+  } = useFetchAllUsers();
+
+  if (isLoadingUsers) {
+    console.log("Fetching...");
+  }
+  if (isErrorUsers) {
+    console.log(errorMsgUsers);
+  }
+  if (isSuccessUsers) {
+    console.log(users);
+  }
+
+  const followers = useMemo(
+    () => users.filter(({ id }) => userInfo?.followers.includes(id)),
+    [users]
+  );
+
+  const following = useMemo(
+    () => users.filter(({ id }) => userInfo?.following.includes(id)),
+    [users]
+  );
+
+  console.log(followers);
+  console.log(following);
 
   let [isOpen, setIsOpen] = useState(false);
 
@@ -38,11 +91,43 @@ const ProfileInfo = ({ currentUser }) => {
     setIsEditProfileOpen(true);
   }
 
+  const userPhoto = userInfo.profilePhoto || "../profile/userPhoto.png";
+
+  // const [isLoadingUsers, setIsLoadingUsers] = useState(true);
+  // const [isSuccessUsers, setIsSuccessUsers] = useState(false);
+  // const [isErrorUsers, setIsErrorUsers] = useState(false);
+  // const [errorMsgUsers, setErrorMsgUsers] = useState(null);
+  // const [users, setUsers] = useState([]);
+
+  // const getFollowersList = async (usersArray) => {
+  //   setIsLoadingUsers(true);
+  //   const results = [];
+
+  //   for (let user of usersArray) {
+  //     const userRef = doc(db, "users", user);
+
+  //     try {
+  //       const docSnap = await getDoc(userRef);
+  //       results.push({ id: docSnap.id, ...docSnap.data() });
+  //     } catch (error) {
+  //       console.log(error.message);
+  //       // setIsErrorUsers(true);
+  //       // setErrorMsgUsers(error.message);
+  //     }
+  //   }
+
+  //   setIsLoadingUsers(false);
+  //   // setIsSuccessUsers(true);
+  //   console.log(results);
+
+  //   // setUsers([...results]);
+
+  //   // return results;
+  // };
+
   if (isLoading) {
     return <Spinner />;
   }
-
-  const userPhoto = userInfo.profilePhoto || "../profile/userPhoto.png";
 
   return (
     <div className="profile-info rounded-lg p-4 bg-white flex justify-between items-start">
@@ -66,11 +151,11 @@ const ProfileInfo = ({ currentUser }) => {
           </div>
         </div>
         <div className="follow-group flex gap-8 items-center">
-          <p>
+          <p onClick={openUsersModal} className="cursor-pointer">
             <span className="font-medium">{userInfo?.followers?.length}</span>{" "}
             <span className="text-secTextColor text-sm">Followers</span>
           </p>
-          <p>
+          <p onClick={openUsersModal} className="cursor-pointer">
             <span className="font-medium">{userInfo?.following?.length}</span>{" "}
             <span className="text-secTextColor text-sm">Following</span>
           </p>
@@ -98,6 +183,14 @@ const ProfileInfo = ({ currentUser }) => {
         closeEditProfileModal={closeEditProfileModal}
         openEditProfileModal={openEditProfileModal}
         userInfo={{ id, ...userInfo }}
+      />
+
+      <UsersModal
+        isUsersModalOpen={isUsersModalOpen}
+        closeUsersModal={closeUsersModal}
+        openUsersModal={openUsersModal}
+        followers={followers}
+        following={following}
       />
     </div>
   );

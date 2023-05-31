@@ -56,10 +56,7 @@ const LeftSide = ({ docRefId, setDocRefId, setOtherUserInfo }) => {
       querySnapshot.forEach((doc) => {
         results.push({ id: doc.id, ...doc.data() });
         setDocRefId(doc.id);
-        console.log(doc.id, " => ", doc.data());
       });
-
-      console.log(results);
 
       if (results.length === 0) {
         const docRef = await addDoc(collection(db, "chats"), {
@@ -67,8 +64,6 @@ const LeftSide = ({ docRefId, setDocRefId, setOtherUserInfo }) => {
           contact2,
         });
         setDocRefId(docRef.id);
-        console.log("Document written with ID: ", docRef.id);
-      } else {
       }
     } catch (error) {
       const errorCode = error.code;

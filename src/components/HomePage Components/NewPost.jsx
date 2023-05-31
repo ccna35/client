@@ -23,7 +23,6 @@ const NewPost = ({ userId }) => {
   // Handles selecting post image.
   const postImageChange = (e) => {
     if (e.target.files && e.target.files.length > 0) {
-      console.log(e.target.files[0].name);
       setSelectedPostImage(e.target.files[0]);
     }
   };
@@ -43,13 +42,9 @@ const NewPost = ({ userId }) => {
 
   const storage = getStorage();
 
-  const uploadPostImage = () => {
-    if (text || selectedPostImage) {
+  const handleAddingNewPost = () => {
+    if (selectedPostImage) {
       setIsLoading(true);
-
-      // let file = e.target.files[0];
-
-      // setFile(e.target.files[0]);
 
       // Create the file metadata
       const metadata = {
@@ -84,7 +79,6 @@ const NewPost = ({ userId }) => {
         },
         (error) => {
           // A full list of error codes is available at
-          // https://firebase.google.com/docs/storage/web/handle-errors
           switch (error.code) {
             case "storage/unauthorized":
               // User doesn't have permission to access the object
@@ -92,8 +86,6 @@ const NewPost = ({ userId }) => {
             case "storage/canceled":
               // User canceled the upload
               break;
-
-            // ...
 
             case "storage/unknown":
               // Unknown error occurred, inspect error.serverResponse
@@ -103,14 +95,16 @@ const NewPost = ({ userId }) => {
         () => {
           // Upload completed successfully, now we can get the download URL
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-            addNewPost(downloadURL);
+            submitNewPostToFireBase(downloadURL);
           });
         }
       );
+    } else if (text && !selectedPostImage) {
+      submitNewPostToFireBase();
     }
   };
 
-  const addNewPost = async (downloadURL) => {
+  const submitNewPostToFireBase = async (downloadURL = null) => {
     try {
       const docRef = await addDoc(collection(db, "posts"), {
         user: userId,
@@ -179,7 +173,7 @@ const NewPost = ({ userId }) => {
         <button
           type="button"
           className="py-2 px-4 text-white rounded-lg bg-accentColor hover:bg-accentColorHover transition-colors duration-300 flex gap-2"
-          onClick={uploadPostImage}
+          onClick={handleAddingNewPost}
           disabled={isLoading}
         >
           {isLoading && <p>{progress} %</p>}

@@ -5,6 +5,7 @@ import Spinner from "../components/GlobalComponents/Spinner";
 import Post from "../components/HomePage Components/Post";
 import useCheckUser from "../custom hooks/User/useCheckUser";
 import useFetchPosts from "../custom hooks/Post/useFetchPosts";
+import useFetchSpecificUsers from "../custom hooks/User/useFetchSpecificUsers";
 
 const ProfilePage = () => {
   const navigate = useNavigate();
