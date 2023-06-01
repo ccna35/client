@@ -44,7 +44,7 @@ function PeopleToFollow() {
                 <UserFollow
                   key={user?.id}
                   user={user}
-                  currentUserData={currentUserData}
+                  currentUserData={currentUserData[0]}
                 />
               );
             })

@@ -1,31 +1,24 @@
 import { useMemo, useState } from "react";
 import MyModal from "../../Modals/PictureModal";
-import { useLocation, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import Spinner from "../GlobalComponents/Spinner";
 import useFetchSingleUser from "../../custom hooks/User/useFetchSingleUser";
 import EditProfileModal from "../../Modals/EditProfileModal";
-import useFetchSpecificUsers from "../../custom hooks/User/useFetchSpecificUsers";
-import {
-  collection,
-  query,
-  where,
-  getDocs,
-  getDoc,
-  doc,
-} from "firebase/firestore";
-import { db } from "../../firebase/config";
 import useFetchAllUsers from "../../custom hooks/User/useFetchAllUsers";
-import UsersModal from "../../Modals/UserModal";
+import UsersModal from "../../Modals/UsersModal";
 
 const ProfileInfo = ({ currentUser }) => {
   const [isUsersModalOpen, setIsUsersModalOpen] = useState(false);
+
+  const [activeTab, setActiveTab] = useState(null);
 
   function closeUsersModal() {
     setIsUsersModalOpen(false);
   }
 
-  function openUsersModal() {
+  function openUsersModal(id) {
     setIsUsersModalOpen(true);
+    setActiveTab(id);
   }
 
   const { id } = useParams();
@@ -46,14 +39,8 @@ const ProfileInfo = ({ currentUser }) => {
     errorMsg: errorMsgUsers,
   } = useFetchAllUsers();
 
-  if (isLoadingUsers) {
-    console.log("Fetching...");
-  }
   if (isErrorUsers) {
     console.log(errorMsgUsers);
-  }
-  if (isSuccessUsers) {
-    console.log(users);
   }
 
   const followers = useMemo(
@@ -66,8 +53,10 @@ const ProfileInfo = ({ currentUser }) => {
     [users]
   );
 
-  console.log(followers);
-  console.log(following);
+  const currentUserData = useMemo(
+    () => users.filter((user) => user.id === currentUser),
+    [users]
+  );
 
   let [isOpen, setIsOpen] = useState(false);
 
@@ -92,38 +81,6 @@ const ProfileInfo = ({ currentUser }) => {
   }
 
   const userPhoto = userInfo.profilePhoto || "../profile/userPhoto.png";
-
-  // const [isLoadingUsers, setIsLoadingUsers] = useState(true);
-  // const [isSuccessUsers, setIsSuccessUsers] = useState(false);
-  // const [isErrorUsers, setIsErrorUsers] = useState(false);
-  // const [errorMsgUsers, setErrorMsgUsers] = useState(null);
-  // const [users, setUsers] = useState([]);
-
-  // const getFollowersList = async (usersArray) => {
-  //   setIsLoadingUsers(true);
-  //   const results = [];
-
-  //   for (let user of usersArray) {
-  //     const userRef = doc(db, "users", user);
-
-  //     try {
-  //       const docSnap = await getDoc(userRef);
-  //       results.push({ id: docSnap.id, ...docSnap.data() });
-  //     } catch (error) {
-  //       console.log(error.message);
-  //       // setIsErrorUsers(true);
-  //       // setErrorMsgUsers(error.message);
-  //     }
-  //   }
-
-  //   setIsLoadingUsers(false);
-  //   // setIsSuccessUsers(true);
-  //   console.log(results);
-
-  //   // setUsers([...results]);
-
-  //   // return results;
-  // };
 
   if (isLoading) {
     return <Spinner />;
@@ -151,12 +108,18 @@ const ProfileInfo = ({ currentUser }) => {
           </div>
         </div>
         <div className="follow-group flex gap-8 items-center">
-          <p onClick={openUsersModal} className="cursor-pointer">
-            <span className="font-medium">{userInfo?.followers?.length}</span>{" "}
+          <p
+            onClick={() => openUsersModal("Followers")}
+            className="cursor-pointer flex gap-2 items-center"
+          >
+            <span className="font-medium">{userInfo?.followers?.length}</span>
             <span className="text-secTextColor text-sm">Followers</span>
           </p>
-          <p onClick={openUsersModal} className="cursor-pointer">
-            <span className="font-medium">{userInfo?.following?.length}</span>{" "}
+          <p
+            onClick={() => openUsersModal("Following")}
+            className="cursor-pointer flex gap-2 items-center"
+          >
+            <span className="font-medium">{userInfo?.following?.length}</span>
             <span className="text-secTextColor text-sm">Following</span>
           </p>
         </div>
@@ -191,6 +154,9 @@ const ProfileInfo = ({ currentUser }) => {
         openUsersModal={openUsersModal}
         followers={followers}
         following={following}
+        currentUserData={currentUserData[0]}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
       />
     </div>
   );

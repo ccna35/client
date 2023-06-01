@@ -9,11 +9,12 @@ function UserFollow({ user, currentUserData }) {
   const [doIFollowThisUser, setDoIFollowThisUser] = useState(false);
 
   const handleFollow = async () => {
+    console.log(currentUserData);
     try {
       // We first add the user to our "following" array if he isn't already there.
-      const myUserRef = doc(db, "users", currentUserData[0].id);
+      const myUserRef = doc(db, "users", currentUserData.id);
       const otherUserRef = doc(db, "users", user.id);
-      if (currentUserData[0].following.includes(user.id)) {
+      if (currentUserData.following.includes(user.id)) {
         // He is in my "following" array hence I'm following him
         setDoIFollowThisUser(true);
         await updateDoc(myUserRef, {
@@ -21,7 +22,7 @@ function UserFollow({ user, currentUserData }) {
         });
         // We then remove our ID from his "followers" array.
         await updateDoc(otherUserRef, {
-          followers: arrayRemove(currentUserData[0].id),
+          followers: arrayRemove(currentUserData.id),
         });
       } else {
         // He is't in my "following" array hence I'm not following him
@@ -31,7 +32,7 @@ function UserFollow({ user, currentUserData }) {
         });
         // We then add our ID to his "followers" array.
         await updateDoc(otherUserRef, {
-          followers: arrayUnion(currentUserData[0].id),
+          followers: arrayUnion(currentUserData.id),
         });
       }
     } catch (e) {
@@ -46,7 +47,7 @@ function UserFollow({ user, currentUserData }) {
           <img src={userPhoto} />
         </div>
         <div className="user-info flex flex-col">
-          <Link to={"user/" + user.id}>
+          <Link to={"/user/" + user.id}>
             <h3 className="text-textColor text-lg transition-colors duration-300 cursor-pointer hover:text-accentColorHover">
               {user.firstName + " " + user.lastName}
             </h3>
@@ -57,13 +58,13 @@ function UserFollow({ user, currentUserData }) {
       <button
         type="button"
         className={`${
-          currentUserData[0].following.includes(user.id)
+          currentUserData.following.includes(user.id)
             ? "bg-secondBgColor text-textColor"
             : "bg-accentColor text-white"
         } py-2 px-4 rounded-lg hover:bg-accentColorHover hover:text-white transition-colors duration-300`}
         onClick={handleFollow}
       >
-        {currentUserData[0].following.includes(user.id) ? "Unfollow" : "Follow"}
+        {currentUserData.following.includes(user.id) ? "Unfollow" : "Follow"}
       </button>
     </div>
   );
