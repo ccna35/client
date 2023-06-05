@@ -68,20 +68,22 @@ const PostPage = () => {
   const [comment, setComment] = useState("");
 
   const addNewComment = async () => {
-    try {
-      const commentsRef = doc(db, "posts", id);
-      const updateComments = await updateDoc(commentsRef, {
-        comments: arrayUnion({
-          user: currentUser,
-          text: comment,
-          createdAt: new Date().getTime(),
-          id: uuidv4(),
-        }),
-      });
+    if (comment) {
+      try {
+        const commentsRef = doc(db, "posts", id);
+        const updateComments = await updateDoc(commentsRef, {
+          comments: arrayUnion({
+            user: currentUser,
+            text: comment,
+            createdAt: new Date().getTime(),
+            id: uuidv4(),
+          }),
+        });
 
-      setComment("");
-    } catch (e) {
-      console.error("Error adding document: ", e);
+        setComment("");
+      } catch (e) {
+        console.error("Error adding document: ", e);
+      }
     }
   };
 

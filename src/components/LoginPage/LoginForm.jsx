@@ -25,8 +25,8 @@ const LoginForm = ({ setCurrentForm }) => {
         setIsLoading(false);
       })
       .catch((error) => {
-        setErrorMsg(error.message);
-        console.log(error.message);
+        if (error.message.includes("user-not-found"))
+          setErrorMsg("Either email or password is incorrect!");
         setIsLoading(false);
       });
   };

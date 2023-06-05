@@ -15,6 +15,13 @@ import Picker from "@emoji-mart/react";
 import Spinner from "../GlobalComponents/Spinner";
 
 const NewPost = ({ userId }) => {
+  const [text, setText] = useState("");
+  const [file, setFile] = useState(null);
+  const [imageLink, setImageLink] = useState(null);
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [progress, setProgress] = useState(0);
+
   // Handling cover photo
   const [selectedPostImage, setSelectedPostImage] = useState(null);
 
@@ -24,6 +31,7 @@ const NewPost = ({ userId }) => {
   const postImageChange = (e) => {
     if (e.target.files && e.target.files.length > 0) {
       setSelectedPostImage(e.target.files[0]);
+      console.log(e.target.files[0]);
     }
   };
 
@@ -33,18 +41,12 @@ const NewPost = ({ userId }) => {
     postImgRef.current.value = "";
   };
 
-  const [text, setText] = useState("");
-  const [file, setFile] = useState(null);
-  const [imageLink, setImageLink] = useState(null);
-
-  const [isLoading, setIsLoading] = useState(false);
-  const [progress, setProgress] = useState(0);
-
   const storage = getStorage();
 
   const handleAddingNewPost = () => {
     if (selectedPostImage) {
       setIsLoading(true);
+      setProgress(0);
 
       // Create the file metadata
       const metadata = {
@@ -64,10 +66,10 @@ const NewPost = ({ userId }) => {
         "state_changed",
         (snapshot) => {
           // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-          const progress = Math.floor(
+          const progressVar = Math.floor(
             (snapshot.bytesTransferred / snapshot.totalBytes) * 100
           );
-          setProgress(progress);
+          setProgress(progressVar);
           switch (snapshot.state) {
             case "paused":
               console.log("Upload is paused");
@@ -160,12 +162,20 @@ const NewPost = ({ userId }) => {
           onChange={(e) => setText(e.target.value)}
         />
       </div>
+      {selectedPostImage && (
+        <div className="w-full bg-gray-200 rounded-full h-2.5">
+          <div
+            className="bg-blue-600 h-2.5 rounded-full transition-all duration-700"
+            style={{ width: progress + "%" }}
+          ></div>
+        </div>
+      )}
 
       <input
         className="relative m-0 block w-fit min-w-0 flex-auto cursor-pointer rounded border border-solid border-neutral-300 bg-clip-padding px-3 py-[0.32rem] text-xs font-normal text-neutral-700 transition duration-300 ease-in-out file:-mx-3 file:-my-[0.32rem] file:cursor-pointer file:overflow-hidden file:rounded-none file:border-0 file:border-solid file:border-inherit file:bg-neutral-100 file:px-3 file:py-[0.32rem] file:text-neutral-700 file:transition file:duration-150 file:ease-in-out file:[border-inline-end-width:1px] file:[margin-inline-end:0.75rem] hover:file:bg-neutral-200 focus:border-primary focus:text-neutral-700 focus:shadow-te-primary focus:outline-none"
         id="formFileSm"
         type="file"
-        accept="image/jpeg, image/png, image/jpg"
+        accept="image/jpeg, image/png, image/jpg, video/*"
         onChange={postImageChange}
         ref={postImgRef}
       />
@@ -193,10 +203,14 @@ const NewPost = ({ userId }) => {
       {selectedPostImage && (
         <div className="w-full flex gap-4">
           <div className="w-56 overflow-hidden rounded-lg">
-            <img
-              src={URL.createObjectURL(selectedPostImage)}
-              className="w-full object-cover"
-            />
+            {selectedPostImage.type.startsWith("video") ? (
+              <video src={URL.createObjectURL(selectedPostImage)} controls />
+            ) : (
+              <img
+                src={URL.createObjectURL(selectedPostImage)}
+                className="w-full object-cover"
+              />
+            )}
           </div>
           <div
             className="grid place-items-center items-start"
