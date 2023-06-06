@@ -22,6 +22,8 @@ const NewPost = ({ userId }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [progress, setProgress] = useState(0);
 
+  const [errMsg, setErrMsg] = useState("");
+
   // Handling cover photo
   const [selectedPostImage, setSelectedPostImage] = useState(null);
 
@@ -32,6 +34,9 @@ const NewPost = ({ userId }) => {
     if (e.target.files && e.target.files.length > 0) {
       setSelectedPostImage(e.target.files[0]);
       console.log(e.target.files[0]);
+      if (e.target.files[0].size >= 20000000) {
+        setErrMsg("Video size must be less than 20MB!");
+      }
     }
   };
 
@@ -39,12 +44,13 @@ const NewPost = ({ userId }) => {
   const removeSelectedPostImage = () => {
     setSelectedPostImage(null);
     postImgRef.current.value = "";
+    setErrMsg("");
   };
 
   const storage = getStorage();
 
   const handleAddingNewPost = () => {
-    if (selectedPostImage) {
+    if (selectedPostImage && !errMsg) {
       setIsLoading(true);
       setProgress(0);
 
@@ -98,6 +104,7 @@ const NewPost = ({ userId }) => {
           // Upload completed successfully, now we can get the download URL
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
             submitNewPostToFireBase(downloadURL);
+            removeSelectedPostImage();
           });
         }
       );
@@ -179,6 +186,7 @@ const NewPost = ({ userId }) => {
         onChange={postImageChange}
         ref={postImgRef}
       />
+      {errMsg && <p className="text-red-500">{errMsg}</p>}
       <div className="btns flex gap-8">
         <button
           type="button"

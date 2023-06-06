@@ -156,11 +156,15 @@ const PostPage = () => {
           <p>{post.text}</p>
           {post.image && (
             <div className="rounded-lg overflow-hidden">
-              <img
-                src={post.image}
-                className="w-full h-full object-cover cursor-pointer"
-                onClick={openModal}
-              />
+              {post.image.includes(".mp4") ? (
+                <video src={post.image} controls />
+              ) : (
+                <img
+                  src={post.image}
+                  className="w-full h-full object-cover cursor-pointer"
+                  onClick={openModal}
+                />
+              )}
               <MyModal
                 isOpen={isOpen}
                 setIsOpen={setIsOpen}
