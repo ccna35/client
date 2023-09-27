@@ -24,6 +24,7 @@ const useFetchAllPosts = (id) => {
   useEffect(() => {
     if (id === null || id === undefined) return;
     const docRef = doc(db, "users", id);
+
     const unsubscribe = onSnapshot(docRef, (doc) => {
       setUser({ ...doc.data() });
 

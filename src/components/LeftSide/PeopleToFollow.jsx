@@ -15,7 +15,6 @@ function PeopleToFollow() {
   } = useCheckUser();
 
   if (isErrorUser) {
-    console.log("isErrorUser: ", errorMsgUser);
     navigate("/login");
   }
   const { isLoading, isError, isSuccess, users, errorMsg } = useFetchAllUsers();
