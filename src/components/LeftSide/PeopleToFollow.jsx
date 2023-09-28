@@ -38,6 +38,7 @@ function PeopleToFollow() {
         ) : (
           users
             ?.filter((user) => user.id !== currentUser)
+            .slice(0, 3)
             .map((user) => {
               return (
                 <UserFollow

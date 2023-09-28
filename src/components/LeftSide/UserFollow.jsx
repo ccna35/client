@@ -9,7 +9,6 @@ function UserFollow({ user, currentUserData }) {
   const [doIFollowThisUser, setDoIFollowThisUser] = useState(false);
 
   const handleFollow = async () => {
-    console.log(currentUserData);
     try {
       // We first add the user to our "following" array if he isn't already there.
       const myUserRef = doc(db, "users", currentUserData.id);

@@ -64,6 +64,15 @@ const LoginForm = ({ setCurrentForm }) => {
     <div
       className={`user-form transition-all duration-300 bg-white flex flex-col gap-8 justify-center items-center p-8 $`}
     >
+      <div className="p-2 rounded-md border border-gray-400 flex flex-col gap-1">
+        <p>Use the credentials below to log in with a test account:</p>
+        <p>
+          <span className="font-medium">Email:</span> ian_danial@yahoo.com
+        </p>
+        <p>
+          <span className="font-medium">Password:</span> 123456
+        </p>
+      </div>
       <div className="flex gap-1">
         <p className="text-textColor">Sign in</p>
         <span
