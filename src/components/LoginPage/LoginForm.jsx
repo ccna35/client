@@ -124,8 +124,9 @@ const LoginForm = ({ setCurrentForm }) => {
 
         <input
           type="submit"
-          value="Login"
-          className="p-2 text-sm bg-accentColor text-textColorLight rounded cursor-pointer hover:bg-accentColorHover transition-colors duration-300"
+          value={isLoading ? "Loading..." : "Login"}
+          disabled={isLoading}
+          className="p-2 text-sm bg-accentColor text-textColorLight rounded cursor-pointer hover:bg-accentColorHover transition-colors duration-300 disabled:bg-gray-400"
         />
       </form>
     </div>

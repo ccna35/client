@@ -54,17 +54,19 @@ function UserFollow({ user, currentUserData }) {
           <p className="text-secTextColor text-sm">@{user.username}</p>
         </div>
       </div>
-      <button
-        type="button"
-        className={`${
-          currentUserData.following.includes(user.id)
-            ? "bg-secondBgColor text-textColor"
-            : "bg-accentColor text-white"
-        } py-2 px-4 rounded-lg hover:bg-accentColorHover hover:text-white transition-colors duration-300`}
-        onClick={handleFollow}
-      >
-        {currentUserData.following.includes(user.id) ? "Unfollow" : "Follow"}
-      </button>
+      {currentUserData.id !== user.id && (
+        <button
+          type="button"
+          className={`${
+            currentUserData.following.includes(user.id)
+              ? "bg-secondBgColor text-textColor"
+              : "bg-accentColor text-white"
+          } py-2 px-4 rounded-lg hover:bg-accentColorHover hover:text-white transition-colors duration-300`}
+          onClick={handleFollow}
+        >
+          {currentUserData.following.includes(user.id) ? "Unfollow" : "Follow"}
+        </button>
+      )}
     </div>
   );
 }

@@ -1,15 +1,8 @@
-import { Link, NavLink, Outlet } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import Navbar from "../components/GlobalComponents/Navbar/Navbar";
 import UserBox from "../components/LeftSide/UserInfoBox";
 import PeopleToFollow from "../components/LeftSide/PeopleToFollow";
-import { io } from "socket.io-client";
 import Footer from "../components/GlobalComponents/Footer";
-
-// const socket = io("http://localhost:3000/");
-
-// socket.on("message", (data) => {
-//   console.log(data); // x8WIv7-mJelg7on_ALbx
-// });
 
 const Root = () => {
   return (

@@ -17,11 +17,6 @@ const SearchInput = () => {
     setSearchInput(e.target.value);
   };
 
-  // function closeSearchPopup() {
-  //   setShowPopup(false);
-  //   setSearchInput("");
-  // }
-
   const closeSearchPopup = () => {
     setShowPopup(false);
     setSearchInput("");

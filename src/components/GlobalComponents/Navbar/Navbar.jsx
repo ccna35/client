@@ -42,7 +42,7 @@ const Navbar = () => {
 
   return (
     <nav className="py-4 px-4 md:px-0 bg-white border-b border-borderColor mb-12">
-      <div className="container mx-auto flex justify-between">
+      <div className="container mx-auto flex gap-4 xl:max-w-4xl">
         <NavLink
           to="/"
           className="py-2 px-4 bg-secondBgColor rounded-lg flex items-center gap-2 hover:bg-gray-300 transition-colors duration-300"
@@ -58,17 +58,17 @@ const Navbar = () => {
           <FaUserAlt />
           <p className="hidden lg:block">Profile</p>
         </NavLink>
-        <NavLink
+        {/* <NavLink
           to="/settings"
           className="py-2 px-4 bg-secondBgColor rounded-lg flex items-center gap-2 hover:bg-gray-300 transition-colors duration-300"
         >
           <BsFillGearFill />
           <p className="hidden lg:block">Settings</p>
-        </NavLink>
-        <div className="py-2 px-4 bg-secondBgColor rounded-lg flex items-center gap-2 hover:bg-gray-300 transition-colors duration-300 cursor-pointer">
+        </NavLink> */}
+        {/* <div className="py-2 px-4 bg-secondBgColor rounded-lg flex items-center gap-2 hover:bg-gray-300 transition-colors duration-300 cursor-pointer">
           <FaBell />
           <p className="hidden lg:block">Notifications</p>
-        </div>
+        </div> */}
         <NavLink
           to="/messages"
           className="py-2 px-4 bg-secondBgColor rounded-lg flex items-center gap-2 hover:bg-gray-300 transition-colors duration-300"
@@ -77,7 +77,7 @@ const Navbar = () => {
           <p className="hidden lg:block">Messages</p>
         </NavLink>
         <button
-          className="py-2 px-4 bg-secondBgColor rounded-lg flex items-center gap-2 hover:bg-gray-300 transition-colors duration-300 cursor-pointer"
+          className="py-2 px-4 bg-secondBgColor rounded-lg flex items-center gap-2 hover:bg-gray-300 transition-colors duration-300 cursor-pointer ml-auto"
           type="button"
           onClick={handleSignOut}
         >
